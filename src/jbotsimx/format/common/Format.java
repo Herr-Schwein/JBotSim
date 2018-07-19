@@ -150,7 +150,7 @@ public class Format {
                 return fmt.formatter;
             }
         }
-        return defaultFormatter;
+        return getDefaultFormatter();
     }
 
     private static class SupportedFormat {
