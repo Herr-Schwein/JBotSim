@@ -1,0 +1,58 @@
+apply plugin: "java"
+
+version = '1.0-alpha26'
+group = "com.github.acasteigts"
+sourceCompatibility = 1.8 // java 8
+targetCompatibility = 1.8
+
+description = "JBotSim : a simulation library for distributed algorithms in dynamic networks."
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    jbotsimCore{
+        java{
+            srcDir 'src/jbotsim'
+        }
+    }
+    jbotsimAll{
+         java{
+             srcDirs = ['src/jbotsim', 'src/jbotsimx']
+        }
+    }
+}
+
+dependencies {
+}
+
+task jbotsimCoreJar(type: Jar){
+    baseName = "jbotsim-core"
+	from sourceSets.jbotsimCore.output
+}
+
+jar{
+	baseName = "jbotsim"
+	from sourceSets.jbotsimAll.output
+	from('src') 
+    {
+      include 'jbotsimx/ui/*.png'
+    }
+}
+
+jar.finalizedBy jbotsimCoreJar
+//jar.finalizedBy jbotsimAllJar
+
+task jbotsimCoreDoc(type: Javadoc) {
+  source = sourceSets.jbotsimCore.allJava
+  destinationDir = file("$buildDir/docs/jbotsim-core")
+}
+
+task jbotsimAllDoc(type: Javadoc) {
+  source = sourceSets.jbotsimAll.allJava
+  destinationDir = file("$buildDir/docs/jbotsim")
+}
+
+javadoc.finalizedBy jbotsimCoreDoc
+javadoc.finalizedBy jbotsimAllDoc
