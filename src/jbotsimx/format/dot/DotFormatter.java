@@ -1,12 +1,15 @@
 package jbotsimx.format.dot;
 
+import guru.nidi.graphviz.model.*;
+import guru.nidi.graphviz.parse.Parser;
+import jbotsim.Color;
 import jbotsim.Link;
 import jbotsim.Node;
 import jbotsim.Topology;
 import jbotsimx.format.common.Formatter;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
+import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * Created by acasteig on 08/10/15.
@@ -25,11 +28,14 @@ public class DotFormatter implements Formatter{
     @Override
     public void importTopology(Topology tp, String s) {
         tp.disableWireless();
-        BufferedReader input = new BufferedReader(new StringReader(s));
-        parseNodes(tp, input);
-        input = new BufferedReader((new StringReader(s)));
-        parseLinks(tp, input);
-        organize(tp, scale);
+
+        try {
+            MutableGraph G = Parser.read(s);
+            makeTopologyFromGraph(G, tp);
+            organize(tp, scale);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -37,45 +43,78 @@ public class DotFormatter implements Formatter{
         return null;
     }
 
-    protected static void parseNodes(Topology tp, BufferedReader input){
-        try {
-            String line = input.readLine();
-            while (line != null){
-                if (line.contains("pos")) {
-                    int comma = line.indexOf(",");
-                    String id = line.substring(0, line.indexOf(" "));
-                    String x = line.substring(line.indexOf("\"")+1, comma);
-                    String y = line.substring(comma+1, line.indexOf("\"", comma));
-                    Node n1 = tp.newInstanceOfModel("default");
-                    n1.setID(Integer.parseInt(id));
-                    n1.setLocation(Double.parseDouble(x), Double.parseDouble(y));
-                    tp.addNode(n1);
-                }
-                line = input.readLine();
+    private void makeTopologyFromGraph(MutableGraph G, Topology tp) {
+        HashMap<MutableNode,Node> nodes = new HashMap<>();
+
+        for(MutableNode mutableNode : G.nodes()) {
+            Node node = tp.newInstanceOfModel("default");
+            extractAttributes(mutableNode, node);
+            tp.addNode(node);
+            nodes.put(mutableNode, node);
+        }
+        Link.Type linkType = G.isDirected() ? Link.Type.DIRECTED : Link.Type.UNDIRECTED;
+        for(MutableNode mutableNode : G.nodes()) {
+            Node src = nodes.get(mutableNode);
+
+            for (guru.nidi.graphviz.model.Link ml : mutableNode.links()) {
+                MutablePortNode mpn = (MutablePortNode)ml.to();
+                Node dst = nodes.get(mpn.node());
+                assert (dst != null);
+                Link l = new Link(src, dst, linkType);
+                extractAttributes(ml, l);
+                tp.addLink(l);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
-    protected static void parseLinks(Topology tp, BufferedReader input){
-        try {
-            String line = input.readLine();
-            while (line != null){
-                if (line.contains("--")) {
-                    int indexDash = line.indexOf("-");
-                    int id1 = Integer.parseInt(line.substring(0, indexDash));
-                    int id2 = Integer.parseInt(line.substring(indexDash + 2, line.indexOf(";")));
-                    Node n1 = tp.findNodeById(id1);
-                    Node n2 = tp.findNodeById(id2);
-                    tp.addLink(new Link(n1, n2));
-                }
-                line = input.readLine();
+
+    private void extractAttributes(MutableNode mn, Node node) {
+        String pos = (String) mn.get("pos");
+        if (pos != null) {
+            String[] xy = pos.split(",");
+            node.setLocation(Double.valueOf(xy[0]), Double.valueOf(xy[1]));
+        }
+
+        String c = (String) mn.get("color");
+        if (c != null) {
+            try {
+                node.setColor(Color.decode(c.substring(0)));
+            } catch (NumberFormatException e) {
+
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        c = (String) mn.get("fillcolor");
+        if (c != null) {
+            try {
+                node.setColor(Color.decode(c.substring(0)));
+            } catch (NumberFormatException e) {
+
+            }
         }
     }
+
+    private void extractAttributes(guru.nidi.graphviz.model.Link ml, Link l) {
+        String c = (String) ml.get("color");
+        if (c != null) {
+            try {
+                l.setColor(Color.decode(c.substring(0)));
+            } catch (NumberFormatException e) {
+
+            }
+        }
+        String w = (String) ml.get("width");
+        if (w != null) {
+            try {
+                l.setWidth(Integer.decode(w));
+            } catch (NumberFormatException e) {
+
+            }
+        }
+    }
+
     public static void organize(Topology tp, double scale){
+        if(tp.getNodes().isEmpty())
+            return;
+
         // Applies Scale
         for (Node node : tp.getNodes())
             node.setLocation(node.getX() * scale, node.getY() * scale);
