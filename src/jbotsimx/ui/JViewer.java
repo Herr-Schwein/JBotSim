@@ -224,6 +224,7 @@ public class JViewer implements CommandListener, ChangeListener, PropertyListene
                     }
                 }
                 Format.importFromFile(jtp.topo, fc.getSelectedFile().toString());
+            }
         });
 
         addCommand("Save topology", cmd -> {
