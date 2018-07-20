@@ -13,7 +13,6 @@ import static org.junit.Assert.*;
 
 import org.junit.rules.ExpectedException;
 
-import java.awt.*;
 import java.io.InputStream;
 import java.util.ArrayList;
 
