@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -46,11 +45,8 @@ public class DotParserTest {
 
         String xmlTp = Format.exportToString(tp, new XMLTopologyFormatter());
         assertNotNull(xmlTp);
-//        String bkupFileName = url.getPath() + "-res.xml";
-//        System.out.println(bkupFileName);
-//        Format.exportToFile(tp, bkupFileName);
 
-        String expectedXml = new String(Files.readAllBytes(Paths.get(url.getPath()+"-res.xml")));
+        String expectedXml = new String(Files.readAllBytes(Paths.get(url.getPath()+".xml")));
 
         assertEquals(expectedXml, xmlTp);
     }
