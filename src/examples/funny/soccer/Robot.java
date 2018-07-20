@@ -10,7 +10,7 @@ public class Robot extends Node {
     @Override
     public void onStart() {
         setSize(14);
-        setIcon("robot.png");
+        setIcon("/examples/funny/soccer/robot.png");
         setDirection(Math.random()*Math.PI*2.0);
         setSensingRange(getSize()+10);
     }

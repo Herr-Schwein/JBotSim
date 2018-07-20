@@ -14,7 +14,7 @@ public class Robot extends Node{
 	public static double dmax = 1; // Vmax / round-duration
 	
 	public Robot() {
-	    setIcon("robot.png");
+		setIcon("/examples/fancy/angularforces/robot.png");
 		setSize(18);
 		setProperty("oldpos", getLocation());
 	}

@@ -11,7 +11,7 @@ public class Drone extends VectorNode {
     public void onStart() {
         super.onStart();
         setSensingRange(20);
-        setIcon("drone.png"); // To be adapted (package path)
+        setIcon("/examples/fancy/vectorracer/drone.png"); // To be adapted (package path)
         setSize(14);
         onPointReached(getLocation());
     }

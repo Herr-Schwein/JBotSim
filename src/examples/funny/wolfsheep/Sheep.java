@@ -12,7 +12,7 @@ public class Sheep extends Node {
 
     @Override
     public void onStart() {
-        setIcon("sheep.png");
+        setIcon("/examples/wolfsheep/sheep.png");
         setSize(12);
         setDirection(Math.random() * Math.PI * 2);
     }

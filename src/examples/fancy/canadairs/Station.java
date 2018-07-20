@@ -16,7 +16,7 @@ public class Station extends Node {
     Map<Point, Canadair> canadairByDestination = new HashMap<Point, Canadair>();
 
     public Station() {
-        setIcon("station.png");
+        setIcon("/examples/fancy/canadairs/station.png");
         setSize(25);
         setCommunicationRange(120);
     }

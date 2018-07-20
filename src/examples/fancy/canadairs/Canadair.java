@@ -14,7 +14,7 @@ public class Canadair extends Node {
     Point lake = new Point(50,50);
 
     public Canadair(){
-        setIcon("canadair.png");
+        setIcon("/examples/fancy/canadairs/canadair.png");
         setSize(18);
         setCommunicationRange(120);
         setSensingRange(30);

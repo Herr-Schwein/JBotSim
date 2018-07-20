@@ -9,6 +9,6 @@ public class Cherry extends Node {
     @Override
     public void onStart() {
         disableWireless();
-        setIcon("cherry.png");
+        setIcon("/examples/fancy/vectorracer/cherry.png");
     }
 }

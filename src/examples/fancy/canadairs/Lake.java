@@ -9,7 +9,7 @@ public class Lake extends Node {
 
     public Lake(){
         disableWireless();
-        setIcon("lake.png");
+        setIcon("/examples/fancy/canadairs/lake.png");
         setSize(45);
     }
 }
