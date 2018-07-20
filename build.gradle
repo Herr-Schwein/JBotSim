@@ -1,10 +1,12 @@
 apply plugin: "java"
+apply plugin: "application"
 
 version = '1.0-alpha26'
 group = "com.github.acasteigts"
 sourceCompatibility = 1.8 // java 8
 targetCompatibility = 1.8
-
+applicationName = "jbotsimAll"
+mainClassName = "examples.basic.helloworld.Main"
 description = "JBotSim : a simulation library for distributed algorithms in dynamic networks."
 
 repositories {
@@ -17,9 +19,15 @@ sourceSets {
             srcDir 'src/jbotsim'
         }
     }
-    jbotsimAll{
+    jbotsim{
          java{
              srcDirs = ['src/jbotsim', 'src/jbotsimx']
+        }
+    }
+    
+    main{
+         java{
+             srcDirs = ['src/jbotsim', 'src/jbotsimx', 'src/examples']
         }
     }
 }
@@ -32,27 +40,58 @@ task jbotsimCoreJar(type: Jar){
 	from sourceSets.jbotsimCore.output
 }
 
-jar{
+task jbotsimJar(type: Jar){
 	baseName = "jbotsim"
-	from sourceSets.jbotsimAll.output
+	from sourceSets.jbotsim.output
+	from('src') 
+    {
+      include 'jbotsimx/ui/*.png'
+      include 'jbotsimx/format/*.xml'
+    }
+}
+jar{
+	baseName = "jbotsim-all"
+	from sourceSets.main.output
 	from('src') 
     {
       include 'jbotsimx/ui/*.png'
     }
 }
-
 jar.finalizedBy jbotsimCoreJar
-//jar.finalizedBy jbotsimAllJar
+jar.finalizedBy jbotsimJar
 
 task jbotsimCoreDoc(type: Javadoc) {
   source = sourceSets.jbotsimCore.allJava
   destinationDir = file("$buildDir/docs/jbotsim-core")
 }
 
-task jbotsimAllDoc(type: Javadoc) {
-  source = sourceSets.jbotsimAll.allJava
+task jbotsimDoc(type: Javadoc) {
+  source = sourceSets.jbotsim.allJava
   destinationDir = file("$buildDir/docs/jbotsim")
 }
 
 javadoc.finalizedBy jbotsimCoreDoc
-javadoc.finalizedBy jbotsimAllDoc
+javadoc.finalizedBy jbotsimDoc
+
+//Create a binary for each example :
+
+task createAllStartScripts() << {
+     // just a placeholder
+}
+  def scripts = [:]
+  fileTree("${project.rootDir}" + File.separator + "src" + File.separator + "examples" + File.separator + "basic").visit{
+    details -> if(details.isDirectory()){
+      scripts.put(details.file.getName(), "examples.basic." + details.file.getName() + ".Main")
+    }
+  }
+  scripts.each() { scriptName, className ->
+          def t = tasks.create(name: scriptName+'StartScript', type: CreateStartScripts) {
+        mainClassName = className
+        applicationName = scriptName
+        outputDir = new File(project.buildDir, 'scripts')
+        classpath = jar.outputs.files + project.configurations.runtime
+    }
+    createAllStartScripts.dependsOn(t)
+  }
+
+
