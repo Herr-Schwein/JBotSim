@@ -34,18 +34,6 @@ public class TracePlayer implements ClockListener {
         start();
     }
 
-    public static void main(String[] args) {
-        try {
-            Topology topology = new Topology();
-            new JViewer(topology);
-            TracePlayer tp = new TracePlayer(topology);
-            tp.loadAndStart(args[0]);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
-
     public void start() {
         topology.resetTime();
         if(! events.isEmpty()) {

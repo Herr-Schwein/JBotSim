@@ -69,26 +69,4 @@ public class TraceRecorder implements MovementListener, SelectionListener, Topol
         builder.write(filename);
     }
 
-    public static void main(String[] args) {
-        try {
-            Topology tp = new Topology();
-            String traceFileName = args[0];
-            TraceRecorder tr = new TraceRecorder(tp);
-
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        tr.stopAndWrite(traceFileName);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            tr.start();
-            new JViewer(tp);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
