@@ -209,8 +209,21 @@ public class JViewer implements CommandListener, ChangeListener, PropertyListene
 
         addCommand("Load topology", cmd-> {
             fc.showOpenDialog(jtp.getParent());
-            if (fc.getSelectedFile() != null)
+            if (fc.getSelectedFile() != null) {
+                if (! jtp.topo.getNodes().isEmpty()) {
+                    int n = JOptionPane.showConfirmDialog(jtp.getParent(),
+                            "Should we reset the current topology ?",
+                            "Make a choice",
+                            JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.QUESTION_MESSAGE);
+                    if (n == JOptionPane.YES_OPTION) {
+                        jtp.getTopology().clear();
+                    } else if (n == JOptionPane.CANCEL_OPTION || n == JOptionPane.CLOSED_OPTION) {
+                        return;
+                    }
+                }
                 Format.importFromFile(jtp.topo, fc.getSelectedFile().toString());
+            }
         });
 
         addCommand("Save topology", cmd -> {
