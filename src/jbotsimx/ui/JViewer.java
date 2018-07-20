@@ -14,6 +14,9 @@ package jbotsimx.ui;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -35,11 +38,11 @@ public class JViewer implements CommandListener, ChangeListener, PropertyListene
     protected int width = 600;
     protected JSlider slideBar = new JSlider(0, width);
 
-    protected enum BarType {COMMUNICATION, SENSING, SPEED}
-
-    ;
+    protected enum BarType {COMMUNICATION, SENSING, SPEED};
     protected BarType slideBarType = null;
     protected JFrame window = null;
+    protected JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
+    private Map<String,Consumer<String>> commands = new HashMap<>();
 
     /**
      * Creates a windowed viewer for the specified topology.
@@ -89,14 +92,7 @@ public class JViewer implements CommandListener, ChangeListener, PropertyListene
      */
     public JViewer(JTopology jtopo, boolean windowed) {
         jtp = jtopo;
-        jtp.addCommand("Set communication range");
-        jtp.addCommand("Set sensing range");
-        jtp.addCommand("Set clock speed");
-        jtp.addCommand("Pause or resume execution");
-        jtp.addCommand("Execute a single step");
-        jtp.addCommand("Restart nodes");
-        jtp.addCommand("Load topology");
-        jtp.addCommand("Save topology");
+        initCommands ();
         jtp.addCommandListener(this);
         jtp.topo.addPropertyListener(this);
         if (windowed) { // This JViewer creates its own window
@@ -167,29 +163,37 @@ public class JViewer implements CommandListener, ChangeListener, PropertyListene
         }
     }
 
-    @Override
-    public void onCommand(String command) {
-        if (command.equals("Set communication range")) {
+    private void addCommand(String cmd, Consumer<String> callback) {
+        getJTopology().addCommand(cmd);
+        commands.put(cmd, callback);
+    }
+    private void initCommands() {
+        addCommand("Set communication range", cmd -> {
             if (slideBarType != BarType.COMMUNICATION)
                 addSlideBar(BarType.COMMUNICATION,
                         (int) jtp.topo.getCommunicationRange());
             else
                 removeSlideBar();
             jtp.updateUI();
-        } else if (command.equals("Set sensing range")) {
+        });
+
+        addCommand ("Set sensing range", cmd -> {
             if (slideBarType != BarType.SENSING)
                 addSlideBar(BarType.SENSING,
                         (int) jtp.topo.getSensingRange());
             else
                 removeSlideBar();
             jtp.updateUI();
-        } else if (command.equals("Set clock speed")) {
+        });
+
+        addCommand("Set clock speed", cmd -> {
             if (slideBarType != BarType.SPEED)
                 addSlideBar(BarType.SPEED, (width - jtp.topo.getClockSpeed() * 40));
             else
                 removeSlideBar();
             jtp.updateUI();
-        } else if (command.equals("Pause or resume execution")) {
+        });
+        addCommand("Pause or resume execution", cmd -> {
             if (!jtp.topo.isStarted())
                 jtp.topo.start();
             else {
@@ -198,21 +202,29 @@ public class JViewer implements CommandListener, ChangeListener, PropertyListene
                 else
                     jtp.topo.resume();
             }
-        } else if (command.equals("Restart nodes")) {
-            jtp.topo.restart();
-        } else if (command.equals("Execute a single step")) {
-            jtp.topo.step();
-        } else if (command.equals("Load topology")) {
-            JFileChooser fc = new JFileChooser();
+        });
+        addCommand("Restart nodes", cmd-> jtp.topo.restart());
+
+        addCommand("Execute a single step", cmd->jtp.topo.step());
+
+        addCommand("Load topology", cmd-> {
             fc.showOpenDialog(jtp.getParent());
             if (fc.getSelectedFile() != null)
                 Format.importFromFile(jtp.topo, fc.getSelectedFile().toString());
-        } else if (command.equals("Save topology")) {
-            JFileChooser fc = new JFileChooser();
+        });
+
+        addCommand("Save topology", cmd -> {
             fc.showSaveDialog(jtp.getParent());
             if (fc.getSelectedFile() != null)
                 Format.exportToFile(jtp.topo, fc.getSelectedFile().toString());
-        }
+        });
+    }
+
+    @Override
+    public void onCommand(String command) {
+        Consumer<String> cmd = commands.get(command);
+        if (cmd != null)
+            cmd.accept(command);
     }
 
     @Override
