@@ -102,7 +102,7 @@ public class Format {
      * a topology based on the same formatter.
      *
      * @param topology The topology to be exported
-     * @result A String representation of the topology
+     * @return A String representation of the topology
      */
     public String exportToString(Topology topology){
         return exportToString(topology, defaultFormatter);
