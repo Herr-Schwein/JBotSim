@@ -104,7 +104,7 @@ public class Format {
      * @param topology The topology to be exported
      * @return A String representation of the topology
      */
-    public String exportToString(Topology topology){
+    public static String exportToString(Topology topology){
         return exportToString(topology, defaultFormatter);
     }
 
@@ -116,7 +116,7 @@ public class Format {
      * @param formatter The format to use
 
      */
-    public String exportToString(Topology topology, Formatter formatter){
+    public static String exportToString(Topology topology, Formatter formatter){
         return formatter.exportTopology(topology);
     }
 
@@ -127,7 +127,7 @@ public class Format {
      * @param topology The topology to be imported
      * @param s A string representation of the topology
      */
-    public void importFromString(Topology topology, String s){
+    public static void importFromString(Topology topology, String s){
         importFromString(topology, s, defaultFormatter);
     }
 
@@ -139,7 +139,7 @@ public class Format {
      * @param s A string representation of the topology
      * @param formatter The format to use
      */
-    public void importFromString(Topology topology, String s, Formatter formatter){
+    public static void importFromString(Topology topology, String s, Formatter formatter){
         formatter.importTopology(topology, s);
     }
 
