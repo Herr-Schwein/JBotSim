@@ -38,6 +38,7 @@ jar{
 	from('src') 
     {
       include 'jbotsimx/ui/*.png'
+      include 'jbotsimx/format/xml/*.xsd'
     }
 }
 
