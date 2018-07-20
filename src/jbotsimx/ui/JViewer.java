@@ -207,16 +207,7 @@ public class JViewer implements CommandListener, ChangeListener, PropertyListene
         addCommand("Restart nodes", cmd-> jtp.topo.restart());
 
         addCommand("Execute a single step", cmd->jtp.topo.step());
-        /*
-         * Layouts
-         */
-        addCommand("Layout as a circle", cmd -> Layouts.circle (jtp.topo));
-        addCommand("Layout as an ellipse", cmd -> Layouts.ellipse (jtp.topo));
-        addCommand("Layout as a line", cmd -> Layouts.line (jtp.topo));
 
-        /*
-         * IO operations
-         */
         addCommand("Load topology", cmd-> {
             fc.showOpenDialog(jtp.getParent());
             if (fc.getSelectedFile() != null) {
@@ -233,9 +224,6 @@ public class JViewer implements CommandListener, ChangeListener, PropertyListene
                     }
                 }
                 Format.importFromFile(jtp.topo, fc.getSelectedFile().toString());
-                if(window != null)
-                    window.setSize(jtp.topo.getWidth(), jtp.topo.getHeight());
-            }
         });
 
         addCommand("Save topology", cmd -> {
