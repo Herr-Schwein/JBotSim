@@ -2,7 +2,7 @@
 <jbotsim version="1.0">
     <topology wireless-enabled="true">
         <classes>
-            <node-class class="examples.basic.broadcasting.BroadcastingNode" id="default"/>
+            <node-class class="jbotsimx.format.xml.BroadcastingNode" id="default"/>
             <message-engine class="jbotsim.MessageEngine" id="default"/>
             <scheduler class="java.lang.Object" id="default"/>
             <clock-class class="jbotsimx.ui.JClock" id="default"/>
