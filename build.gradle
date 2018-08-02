@@ -9,30 +9,53 @@ applicationName = "jbotsimAll"
 mainClassName = "examples.basic.helloworld.Main"
 description = "JBotSim : a simulation library for distributed algorithms in dynamic networks."
 
+// to prevent errors with french comments
+compileJava.options.encoding = 'UTF-8'
+
 repositories {
     mavenCentral()
 }
 
 sourceSets {
-    jbotsimCore{
-        java{
-            srcDir 'src/jbotsim'
+    main {
+        java {
+            srcDirs = [ "src/jbotsim", "src/jbotsimx", "src/examples" ]
+        }
+        resources {
+            srcDirs = main.java.srcDirs
         }
     }
-    jbotsim{
-         java{
-             srcDirs = ['src/jbotsim', 'src/jbotsimx']
-        }
-    }
-    
-    main{
-         java{
-             srcDirs = ['src/jbotsim', 'src/jbotsimx', 'src/examples']
-        }
-    }
-}
 
-dependencies {
+    jbotsimCore {
+        java {
+            srcDirs = main.java.srcDirs
+            include "jbotsim/**/*.java"
+        }
+        resources {
+            srcDirs = main.resources.srcDirs
+            include "jbotsim/**/*"
+        }
+    }
+
+    jbotsim {
+        java {
+            srcDirs = main.java.srcDirs
+            exclude "examples/**/*.java"
+        }
+        resources {
+            srcDirs = main.resources.srcDirs
+            exclude "examples/**/*"
+        }
+    }
+
+    test {
+        java {
+            srcDirs = [ "test/java"]
+        }
+        resources {
+            srcDirs = [ "test/resources" ]
+        }
+    }
 }
 
 task jbotsimCoreJar(type: Jar){
@@ -43,21 +66,13 @@ task jbotsimCoreJar(type: Jar){
 task jbotsimJar(type: Jar){
 	baseName = "jbotsim"
 	from sourceSets.jbotsim.output
-	from('src') 
-    {
-      include 'jbotsimx/ui/*.png'
-      include 'jbotsimx/format/*.xml'
-    }
 }
+
 jar{
 	baseName = "jbotsim-all"
 	from sourceSets.main.output
-	from('src') 
-    {
-      include 'jbotsimx/ui/*.png'
-      include 'jbotsimx/format/xml/*.xsd'
-    }
 }
+
 jar.finalizedBy jbotsimCoreJar
 jar.finalizedBy jbotsimJar
 
@@ -95,4 +110,69 @@ task createAllStartScripts() << {
     createAllStartScripts.dependsOn(t)
   }
 
+/**
+ * Tests
+ */
 
+// Non-standard location of tests
+sourceSets {
+    test {
+    }
+
+    jbotsimJarTest {
+        java.srcDirs = test.java.srcDirs
+        resources.srcDirs = test.resources.srcDirs
+        compileClasspath += jbotsimJar.outputs.files
+        runtimeClasspath += jbotsimJar.outputs.files
+    }
+
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.12'
+    jbotsimJarTestImplementation 'junit:junit:4.12'
+}
+
+configurations {
+    jbotsimJarTestImplementation.extendsFrom implementation
+    jbotsimJarTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
+def commonTestSettings = {
+    useJUnit ()
+    testLogging {
+        warn {
+            events = [ "passed", "failed", "skipped" ]
+            showCauses = true
+            showStackTraces = true
+            showExceptions = true
+            exceptionFormat = "full"
+        }
+    }
+
+    filter {
+        includeTestsMatching "*"
+    }
+
+    doLast {
+        String outDirName = rootDir.toPath().relativize(project.testReportDir.toPath()).toString()
+        println ()
+        println ("View test report in: " + outDirName +  File.separator + name + File.separator + "index.html")
+    }
+}
+
+test {
+    configure commonTestSettings
+}
+
+task jbotsimJarTest (type : Test) {
+    configure commonTestSettings
+    testClassesDirs = sourceSets.jbotsimJarTest.output.classesDirs
+    classpath = sourceSets.jbotsimJarTest.runtimeClasspath
+    shouldRunAfter test
+
+    println(classpath.files)
+}
+
+
+check.dependsOn jbotsimJarTest
