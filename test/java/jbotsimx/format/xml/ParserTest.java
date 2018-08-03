@@ -6,6 +6,7 @@ import jbotsim.Topology;
 import org.hamcrest.core.IsNull;
 import org.hamcrest.core.IsInstanceOf;
 import org.hamcrest.core.StringContains;
+import org.hamcrest.core.AllOf;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -231,7 +232,9 @@ public class ParserTest {
     }
 
     private void assertXSDValidationError(XMLParser.ParserException e, String error) {
-        assertThat(e.getMessage(), StringContains.containsString("XSD validation error: "+error+" :"));
+        assertThat(e.getMessage(),
+                AllOf.allOf(StringContains.containsString("XSD validation error"),
+                            StringContains.containsString(error)));
     }
 
     private void assertCauseParserExceptionIs(XMLParser.ParserException e, Class c) {
