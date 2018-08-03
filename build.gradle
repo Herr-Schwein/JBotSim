@@ -23,9 +23,7 @@ repositories {
  */
 task cloneGraphvizJava {
     project.ext.dotparserDir = buildDir.toString() +"/dotparser"
-    if (file(project.ext.dotparserDir).exists ()) {
-        project.ext.dotParserRepo = grgit.pull ()
-    } else {
+    if (! file(project.ext.dotparserDir).exists ()) {
         project.ext.dotParserRepo = grgit.clone {
             dir = project.ext.dotparserDir
             uri = "https://github.com/nidi3/graphviz-java.git"
