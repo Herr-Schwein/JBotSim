@@ -1,3 +1,5 @@
+plugins { id "org.ajoberstar.grgit" version "3.0.0-beta.1" }
+
 apply plugin: "java"
 apply plugin: "application"
 
@@ -15,6 +17,45 @@ compileJava.options.encoding = 'UTF-8'
 repositories {
     mavenCentral()
 }
+
+/**
+ * Clone GIT repo of Graphviz-Java
+ */
+
+task cloneGraphvizJava {
+    project.ext.dotparserDir = buildDir.toString() +"/dotparser"
+    if (file(project.ext.dotparserDir).exists ()) {
+        project.ext.dotParserRepo = grgit.pull ()
+    } else {
+        project.ext.dotParserRepo = grgit.clone {
+            dir = project.ext.dotparserDir
+            uri = "https://github.com/nidi3/graphviz-java.git"
+            refToCheckout = "classic"
+        }
+    }
+}
+
+task copyDotParserToSrc (type: Copy) {
+    def baseDir = project.ext.dotparserDir.toString()+ "/graphviz-java/src/main/java"
+    def dstDir = "src/main/java"
+
+    from (baseDir) {
+        exclude "**/engine"
+        exclude "**/service"
+    }
+    into (dstDir)
+
+    dependsOn cloneGraphvizJava
+    enabled = ! file(dstDir+"/guru").exists()
+}
+
+compileJava.dependsOn copyDotParserToSrc
+
+task cleanDotParserSources(type: Delete) {
+    delete "src/main/java/guru"
+}
+
+clean.dependsOn cleanDotParserSources
 
 sourceSets {
     main {
