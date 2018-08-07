@@ -21,7 +21,6 @@ repositories {
 /**
  * Clone GIT repo of Graphviz-Java
  */
-
 task cloneGraphvizJava {
     project.ext.dotparserDir = buildDir.toString() +"/dotparser"
     if (file(project.ext.dotparserDir).exists ()) {
@@ -30,14 +29,14 @@ task cloneGraphvizJava {
         project.ext.dotParserRepo = grgit.clone {
             dir = project.ext.dotparserDir
             uri = "https://github.com/nidi3/graphviz-java.git"
-            refToCheckout = "classic"
+            refToCheckout = "master"
         }
     }
 }
 
 task copyDotParserToSrc (type: Copy) {
     def baseDir = project.ext.dotparserDir.toString()+ "/graphviz-java/src/main/java"
-    def dstDir = "src/main/java"
+    def dstDir = "src/"
 
     from (baseDir) {
         exclude "**/engine"
@@ -52,7 +51,7 @@ task copyDotParserToSrc (type: Copy) {
 compileJava.dependsOn copyDotParserToSrc
 
 task cleanDotParserSources(type: Delete) {
-    delete "src/main/java/guru"
+    delete "src/guru"
 }
 
 clean.dependsOn cleanDotParserSources
@@ -60,7 +59,7 @@ clean.dependsOn cleanDotParserSources
 sourceSets {
     main {
         java {
-            srcDirs = [ "src/jbotsim", "src/jbotsimx", "src/examples" ]
+            srcDirs = [ "src/guru", "src/jbotsim", "src/jbotsimx", "src/examples" ]
         }
         resources {
             srcDirs = main.java.srcDirs
