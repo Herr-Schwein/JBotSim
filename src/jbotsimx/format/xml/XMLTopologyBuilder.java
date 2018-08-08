@@ -111,6 +111,7 @@ public class XMLTopologyBuilder extends XMLBuilder {
 
         IDENTIFIER_ATTR.setAttribute(ne, n.getID());
         COLOR_ATTR.setNotDefaultAttribute(ne, colorToXml(n.getColor()), colorToXml(Node.DEFAULT_COLOR));
+        ICON_ATTR.setNotDefaultAttribute(ne, n.getIcon(), (String) null);
         SIZE_ATTR.setNotDefaultAttribute(ne, n.getSize(), Node.DEFAULT_SIZE);
         COMMUNICATION_RANGE_ATTR.setNotDefaultAttribute(ne, n.getCommunicationRange(),
                 tp.getCommunicationRange());
