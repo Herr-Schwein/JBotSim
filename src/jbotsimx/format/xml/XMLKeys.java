@@ -54,6 +54,7 @@ public enum XMLKeys {
     WIDTH_ATTR("width"),
     HEIGHT_ATTR("height"),
     COLOR_ATTR("color"),
+    ICON_ATTR("icon"),
     SIZE_ATTR("size"),
     LOCATION_X_ATTR("x"),
     LOCATION_Y_ATTR("y"),

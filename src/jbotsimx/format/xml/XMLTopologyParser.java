@@ -181,7 +181,9 @@ public class XMLTopologyParser extends XMLParser {
         nodeids.put(id, n);
 
         n.setColor(parseColor(ne, jbotsim.Node.DEFAULT_COLOR));
-
+        if (ICON_ATTR.isAttributeOf(ne)) {
+            n.setIcon(ICON_ATTR.getValueFor(ne));
+        }
         int size = SIZE_ATTR.getValueFor(ne, jbotsim.Node.DEFAULT_SIZE);
         n.setSize(size);
         double cr = COMMUNICATION_RANGE_ATTR.getValueFor(ne, tp.getCommunicationRange());
