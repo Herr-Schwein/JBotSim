@@ -17,6 +17,8 @@ import java.util.List;
 import jbotsim.event.ClockListener;
 import jbotsim.event.MovementListener;
 
+import static jbotsim.Node.PropString.*;
+
 public class Node extends _Properties implements ClockListener, Comparable<Node> {
     public static final Color DEFAULT_COLOR = null;
     public static final int DEFAULT_SIZE = 8;
@@ -35,6 +37,21 @@ public class Node extends _Properties implements ClockListener, Comparable<Node>
     Object label = null;
     Integer ID = -1;
     int size = DEFAULT_SIZE;
+
+    enum PropString {
+        COLOR("color"),
+        ICON("icon"),
+        LABEL("label"),
+        SIZE("size");
+
+        PropString(String str) { value = str; };
+
+        public String toString() {
+            return value;
+        }
+
+        private final String value;
+    };
 
     /**
      * Returns the identifier of this node.
@@ -182,7 +199,7 @@ public class Node extends _Properties implements ClockListener, Comparable<Node>
      */
     public void setColor(Color color) {
         this.color = color;
-        setProperty("color", color); // Used for property notification
+        setProperty(COLOR.toString(), color); // Used for property notification
     }
 
     /**
@@ -222,7 +239,11 @@ public class Node extends _Properties implements ClockListener, Comparable<Node>
      * </pre>
      */
     public void setIcon(String fileName) {
-        setProperty("icon", fileName);
+        setProperty(ICON.toString(), fileName);
+    }
+
+    public String getIcon() {
+        return (String) getProperty(ICON.toString());
     }
 
     /**
@@ -237,7 +258,7 @@ public class Node extends _Properties implements ClockListener, Comparable<Node>
      */
     public void setSize(int size) {
         this.size = size;
-        setProperty("size", size); // used for property notification
+        setProperty(SIZE.toString(), size); // used for property notification
     }
 
     /**
@@ -259,7 +280,7 @@ public class Node extends _Properties implements ClockListener, Comparable<Node>
     @Deprecated
     public void setState(Object state) {
         this.label = state;
-        setProperty("label", label); // Used for property notification
+        setProperty(LABEL.toString(), label); // Used for property notification
     }
 
     /**
@@ -275,7 +296,7 @@ public class Node extends _Properties implements ClockListener, Comparable<Node>
      */
     public void setLabel(Object label) {
         this.label = label;
-        setProperty("label", label); // Used for property notification
+        setProperty(LABEL.toString(), label); // Used for property notification
     }
 
     /**
