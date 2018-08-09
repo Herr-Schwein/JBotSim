@@ -11,8 +11,6 @@ applicationName = "jbotsimAll"
 mainClassName = "examples.basic.helloworld.Main"
 description = "JBotSim : a simulation library for distributed algorithms in dynamic networks."
 
-// to prevent errors with french comments
-compileJava.options.encoding = 'UTF-8'
 
 repositories {
     mavenCentral()
@@ -95,6 +93,10 @@ sourceSets {
         }
     }
 }
+// to prevent errors with french comments
+compileJava.options.encoding = 'UTF-8'
+compileJbotsimJava.options.encoding = 'UTF-8'
+compileJbotsimCoreJava.options.encoding = 'UTF-8'
 
 task jbotsimCoreJar(type: Jar){
     baseName = "jbotsim-core"
