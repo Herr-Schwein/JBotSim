@@ -2,6 +2,7 @@ plugins { id "org.ajoberstar.grgit" version "3.0.0-beta.1" }
 
 apply plugin: "java"
 apply plugin: "application"
+apply plugin: "idea"
 
 version = '1.0-alpha26'
 group = "com.github.acasteigts"
