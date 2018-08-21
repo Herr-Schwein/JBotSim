@@ -59,7 +59,7 @@ sourceSets {
             srcDirs = [ "src/guru", "src/jbotsim", "src/jbotsimx", "src/examples" ]
         }
         resources {
-            srcDirs = main.java.srcDirs
+            srcDir "src"
         }
     }
 
