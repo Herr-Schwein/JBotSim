@@ -2,12 +2,14 @@ package examples.funny.cowboy;
 
 import jbotsim.Node;
 
+import java.io.File;
+
 public class Cow extends Node{
     static Node farmer;
     int speed = 0;
 
     public Cow(){
-        setIcon("/examples/cowboy/cow.png");
+        setIcon("cow.png");
         setSize(30);
         disableWireless();
     }
