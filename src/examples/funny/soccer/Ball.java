@@ -13,7 +13,7 @@ public class Ball extends Node{
 
     @Override
     public void onStart() {
-        setIcon("/examples/funny/soccer/ball.png");
+        setIcon("ball.png");
         disableWireless();
     }
 

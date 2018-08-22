@@ -59,7 +59,7 @@ public class JNode extends JButton implements MouseListener, MouseMotionListener
     public void updateIcon() {
         String path = (String) node.getProperty("icon");
         try {
-            URL iconUrl = getClass().getResource(path);
+            URL iconUrl = node.getClass().getResource(path);
             if (iconUrl != null)
                 icon = Toolkit.getDefaultToolkit().getImage(iconUrl);
             else
@@ -77,7 +77,7 @@ public class JNode extends JButton implements MouseListener, MouseMotionListener
 
     private void setDefaultIcon() {
         Toolkit tk = Toolkit.getDefaultToolkit();
-        icon = tk.getImage(getClass().getResource("/jbotsimx/ui/circle.png"));
+        icon = tk.getImage(getClass().getResource("circle.png"));
         updateIconSize();
     }
 
