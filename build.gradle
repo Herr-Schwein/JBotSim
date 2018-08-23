@@ -46,7 +46,8 @@ task copyDotParserToSrc (type: Copy) {
 }
 
 compileJava.dependsOn copyDotParserToSrc
-[ ideaProject, ideaModule, ideaWorkspace ].each { t -> t.dependsOn(copyDotParserToSrc) }
+tasks.idea.dependsOn(cleanIdea)
+tasks.idea.dependsOn(copyDotParserToSrc)
 
 task cleanDotParserSources(type: Delete) {
     delete "src/guru"
