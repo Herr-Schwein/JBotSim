@@ -233,6 +233,8 @@ public class JViewer implements CommandListener, ChangeListener, PropertyListene
                     }
                 }
                 Format.importFromFile(jtp.topo, fc.getSelectedFile().toString());
+                if(window != null)
+                    window.setSize(jtp.topo.getWidth(), jtp.topo.getHeight());
             }
         });
 
