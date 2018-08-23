@@ -26,6 +26,7 @@ import jbotsim.Topology;
 import jbotsim._Properties;
 import jbotsim.event.PropertyListener;
 import jbotsimx.format.common.Format;
+import jbotsimx.topology.Layouts;
 
 /**
  * The viewer includes a central jtopology which will draw the attached
@@ -206,7 +207,16 @@ public class JViewer implements CommandListener, ChangeListener, PropertyListene
         addCommand("Restart nodes", cmd-> jtp.topo.restart());
 
         addCommand("Execute a single step", cmd->jtp.topo.step());
+        /*
+         * Layouts
+         */
+        addCommand("Layout as a circle", cmd -> Layouts.circle (jtp.topo));
+        addCommand("Layout as an ellipse", cmd -> Layouts.ellipse (jtp.topo));
+        addCommand("Layout as a line", cmd -> Layouts.line (jtp.topo));
 
+        /*
+         * IO operations
+         */
         addCommand("Load topology", cmd-> {
             fc.showOpenDialog(jtp.getParent());
             if (fc.getSelectedFile() != null) {
