@@ -58,7 +58,7 @@ clean.dependsOn cleanDotParserSources
 sourceSets {
     main {
         java {
-            srcDirs = [ "src/guru", "src/jbotsim", "src/jbotsimx", "src/examples" ]
+            srcDirs = [ "src" ]
         }
         resources {
             srcDir "src"
@@ -79,11 +79,15 @@ sourceSets {
     jbotsim {
         java {
             srcDirs = main.java.srcDirs
-            exclude "examples/**/*.java"
+            include "jbotsim/**/*.java"
+            include "jbotsimx/**/*.java"
+            include "guru/**/*.java"
         }
         resources {
             srcDirs = main.resources.srcDirs
-            exclude "examples/**/*"
+            include "jbotsim/"
+            include "jbotsimx/"
+            include "guru/"
         }
     }
 
