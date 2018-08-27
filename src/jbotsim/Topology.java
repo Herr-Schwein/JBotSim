@@ -447,9 +447,9 @@ public class Topology extends _Properties implements ClockListener {
     public void addNode(double x, double y, Node n) {
         pause();
         if (x == -1)
-            x = Math.random() * width;
+            x = PRNG.nextInt(width);
         if (y == -1)
-            y = Math.random() * height;
+            y = PRNG.nextInt(height);
         if (n.getX() == 0 && n.getY() == 0)
             n.setLocation(x, y);
 

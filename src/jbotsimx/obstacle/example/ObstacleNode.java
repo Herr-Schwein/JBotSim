@@ -1,6 +1,7 @@
 package jbotsimx.obstacle.example;
 
 import jbotsim.Node;
+import jbotsim.PRNG;
 import jbotsim.Point;
 import jbotsim.Point;
 import jbotsimx.obstacle.core.Obstacle;
@@ -14,10 +15,8 @@ import java.util.Random;
  */
 public class ObstacleNode extends Node implements ObstacleListener{
 
-    private static Random r = new Random();
-
     public ObstacleNode() {
-        setProperty("target", new Point(r.nextInt(800), r.nextInt(600)));
+        setProperty("target", new Point(PRNG.nextInt(800), PRNG.nextInt(600)));
         setSensingRange(25);
     }
 
@@ -49,7 +48,7 @@ public class ObstacleNode extends Node implements ObstacleListener{
         Point n = new Point(this.getX(),this.getY(),this.getZ());
         if(p.distance(tmp) < this.getSensingRange() && p.distance(tmp) < p.distance(n)){
             do {
-                setProperty("target", new Point(r.nextInt(800), r.nextInt(600)));
+                setProperty("target", new Point(PRNG.nextInt(800), PRNG.nextInt(600)));
                 Point target = (Point)getProperty("target");
                 double direction = Math.atan2(target.getX() - this.getX(), - (target.getY() - this.getY())) - Math.PI/2;
                 tmp2 = new Point(this.getX() + Math.cos(direction), this.getY() + Math.sin(direction),0);
@@ -64,7 +63,7 @@ public class ObstacleNode extends Node implements ObstacleListener{
         setDirection(target);
         move();
         if (distance(target) < 15)
-            setProperty("target", new Point(r.nextInt(800), r.nextInt(600)));
+            setProperty("target", new Point(PRNG.nextInt(800), PRNG.nextInt(600)));
     }
 
 }

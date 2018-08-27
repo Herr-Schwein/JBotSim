@@ -2,9 +2,8 @@ package jbotsimx.topology;
 
 import jbotsim.Link;
 import jbotsim.Node;
+import jbotsim.PRNG;
 import jbotsim.Topology;
-
-import java.util.Random;
 
 public class TopologyGeneratorFactory {
     private boolean directed = false;
@@ -373,8 +372,6 @@ public class TopologyGeneratorFactory {
     }
 
     private class RandomLocationsGenerator implements Generator {
-        private Random rnd = new Random();
-
         @Override
         public void generate(Topology tp) {
             try {
@@ -383,7 +380,7 @@ public class TopologyGeneratorFactory {
                     Link.Type type = directed ? Link.Type.DIRECTED : Link.Type.UNDIRECTED;
                     for (int i = 0; i < order; i++) {
                         for (int j = i+1; j < order; j++) {
-                            if (rnd.nextDouble() > 0.2) {
+                            if (PRNG.nextDouble() > 0.2) {
                                 tp.addLink(new Link(nodes[i], nodes[j], type, Link.Mode.WIRED));
                             }
                         }
@@ -403,7 +400,7 @@ public class TopologyGeneratorFactory {
 
             for(int i = 0; i < order; i++) {
                 Node n = nodeClass.getConstructor().newInstance();
-                n.setLocation(x0 + rnd.nextDouble()*w, y0+ rnd.nextDouble()*h);
+                n.setLocation(x0 + PRNG.nextDouble()*w, y0+ PRNG.nextDouble()*h);
                 n.setWirelessStatus(wirelessEnabled);
                 tp.addNode(n);
                 result[i] = n;

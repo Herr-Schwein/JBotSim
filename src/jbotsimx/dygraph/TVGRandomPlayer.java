@@ -1,15 +1,13 @@
 package jbotsimx.dygraph;
 
-import java.util.Random;
-
+import jbotsim.PRNG;
 import jbotsim.Topology;
 import jbotsimx.ui.JViewer;
 
 public class TVGRandomPlayer extends TVGPlayer{
     int timeBound;
     int presenceBound;
-    Random rand=new Random();
-    
+
     public TVGRandomPlayer(TVG tvg, Topology tp) {
         this(tvg, tp, 50);
     }
@@ -21,7 +19,7 @@ public class TVGRandomPlayer extends TVGPlayer{
         this.timeBound=timeBound;
         this.presenceBound=presenceBound;
         for (TVLink l : super.tvg.tvlinks){
-            l.setProperty("nextApp", rand.nextInt(timeBound-presenceBound));
+            l.setProperty("nextApp", PRNG.nextInt(timeBound-presenceBound));
             l.setProperty("nextDis", -1);
         }
         updateLinks();
@@ -33,8 +31,8 @@ public class TVGRandomPlayer extends TVGPlayer{
             int nextDis=(Integer)l.getProperty("nextDis");
             if (now==nextApp){
                 tp.addLink(l);
-                l.setProperty("nextDis", now+(rand.nextInt(presenceBound-1))+1);
-                l.setProperty("nextApp", now+(rand.nextInt(timeBound-presenceBound-1))+presenceBound+1);
+                l.setProperty("nextDis", now+(PRNG.nextInt(presenceBound-1))+1);
+                l.setProperty("nextApp", now+(PRNG.nextInt(timeBound-presenceBound-1))+presenceBound+1);
             }else if(now==nextDis){
                 tp.removeLink(l);
             }

@@ -1,5 +1,6 @@
 package examples.misc.mobilitymodels;
 
+import jbotsim.PRNG;
 import jbotsim.Point;
 
 import jbotsim.Node;
@@ -17,7 +18,8 @@ public class GlobalRWP implements ClockListener{
 		for (Node n : tp.getNodes()){
 			Point target = (Point)n.getProperty("target");
 			if (target == null || n.getLocation().distance(target) < 2){
-				target = new Point(Math.random()*400, Math.random()*300);
+			    target = new Point(PRNG.nextDouble()*400,
+						   PRNG.nextDouble()*300);
 				n.setProperty("target", target);
 			}
 			n.setDirection(target);

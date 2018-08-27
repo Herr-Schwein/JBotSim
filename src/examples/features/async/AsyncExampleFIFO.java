@@ -27,8 +27,6 @@ public class AsyncExampleFIFO extends Node {
     public void onMessage(Message message) {
         System.out.println("reçu à " + getTime());
         System.out.println(message.getContent());
-
-        //double d = Math.random();
     }
 
     public static void main(String[] args) {

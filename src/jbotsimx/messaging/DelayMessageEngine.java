@@ -2,10 +2,10 @@ package jbotsimx.messaging;
 
 import jbotsim.Message;
 import jbotsim.MessageEngine;
+import jbotsim.PRNG;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 /**
  * Created by acasteig on 2/20/15.
@@ -13,7 +13,6 @@ import java.util.Random;
 public class DelayMessageEngine extends MessageEngine {
     protected HashMap<Message, Integer> delays = new HashMap<Message,Integer>();
     protected int delay = 1; // messages sent in round i are delivered in round i+delay
-    protected Random r = new Random();
     protected boolean isRandom = false;
 
     public DelayMessageEngine(int delay){
@@ -30,7 +29,7 @@ public class DelayMessageEngine extends MessageEngine {
             delays.put(m, delays.get(m)-1);
         for (Message m : super.collectMessages())
             if (isRandom)
-                delays.put(m, r.nextInt(delay));
+                delays.put(m, PRNG.nextInt(delay));
             else
                 delays.put(m,delay);
         for (Message m : new ArrayList<Message>(delays.keySet()))

@@ -1,17 +1,14 @@
 package examples.misc.mobilitymodels;
 
 import jbotsim.Node;
+import jbotsim.PRNG;
 import jbotsim.Topology;
 import jbotsim.event.ClockListener;
 import jbotsim.event.TopologyListener;
 import jbotsimx.ui.JViewer;
 
-import java.util.Random;
-
-
 public class SimpleHighway implements ClockListener, TopologyListener{
 	Topology tp;
-    Random rand=new Random();
 	boolean voie=true;
     
 	public SimpleHighway(Topology tp){
@@ -21,7 +18,7 @@ public class SimpleHighway implements ClockListener, TopologyListener{
 	}
 
 	public void onNodeAdded(Node n) {
-		n.setProperty("speed", new Double(rand.nextDouble()*50+30));
+		n.setProperty("speed", new Double(PRNG.nextDouble()*50+30));
 		n.setLocation(n.getX(),voie?200:186);
 		n.setDirection(0);
         voie=!voie;

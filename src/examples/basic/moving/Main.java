@@ -1,5 +1,6 @@
 package examples.basic.moving;
 
+import jbotsim.PRNG;
 import jbotsim.Topology;
 import jbotsimx.ui.JViewer;
 

@@ -1,6 +1,7 @@
 package examples.funny.soccer;
 
 import jbotsim.Node;
+import jbotsim.PRNG;
 
 /**
  * Created by Arnaud Casteigts on 06/04/17.
@@ -11,7 +12,7 @@ public class Robot extends Node {
     public void onStart() {
         setSize(14);
         setIcon("robot.png");
-        setDirection(Math.random()*Math.PI*2.0);
+        setDirection(PRNG.nextDouble()*Math.PI*2.0);
         setSensingRange(getSize()+10);
     }
 
@@ -25,7 +26,7 @@ public class Robot extends Node {
     @Override
     public void onSensingIn(Node node) {
         if (node instanceof Ball){
-            ((Ball) node).shoot(getDirection(), Math.random()*50);
+            ((Ball) node).shoot(getDirection(), PRNG.nextDouble()*50);
         }
     }
 }

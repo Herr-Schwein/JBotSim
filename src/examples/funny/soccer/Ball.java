@@ -2,6 +2,7 @@ package examples.funny.soccer;
 
 import jbotsim.Node;
 
+import jbotsim.PRNG;
 import jbotsim.Point;
 
 /**
@@ -30,10 +31,10 @@ public class Ball extends Node{
     }
 
     public void randomShoot(){
-        double x = Math.random()*getTopology().getWidth();
-        double y = Math.random()*getTopology().getHeight();
+        double x = PRNG.nextDouble()*getTopology().getWidth();
+        double y = PRNG.nextDouble()*getTopology().getHeight();
         Point p = new Point(x, y);
-        double speed = Math.random()*40 + 10;
+        double speed = PRNG.nextDouble()*40 + 10;
         shoot(p, speed);
     }
 

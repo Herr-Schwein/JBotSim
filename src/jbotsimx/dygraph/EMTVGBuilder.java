@@ -1,9 +1,9 @@
 package jbotsimx.dygraph;
 
-import java.util.Random;
 import java.util.Vector;
 
 import jbotsim.Node;
+import jbotsim.PRNG;
 
 /*
  * Edge-Markovian Time-Varying Graph Builder.
@@ -21,25 +21,23 @@ public class EMTVGBuilder {
         return tvg;
     }
     private static void createInitialEdges(TVG tvg, double steadyProb){
-        Random r=new Random();
         Vector<Node> nodes=tvg.nodes;
         for (int i=0; i<nodes.size(); i++){
             for (int j=i+1; j<nodes.size(); j++){
                 TVLink l=new TVLink(nodes.elementAt(i), nodes.elementAt(j));
                 tvg.tvlinks.add(l);
-                if (r.nextDouble()<steadyProb)
+                if (PRNG.nextDouble()<steadyProb)
                     l.appearanceDates.add(0);
             }
         }        
     }
     private static void createNextEdges(TVG tvg, int date, double birthRate, double deathRate){
-        Random r=new Random();
         for (TVLink l : tvg.tvlinks){
             if (l.isPresentAtTime(date-1)){
-                if (r.nextDouble()<deathRate)
+                if (PRNG.nextDouble()<deathRate)
                     l.disappearanceDates.add(date);
             }else{
-                if (r.nextDouble()<birthRate)
+                if (PRNG.nextDouble()<birthRate)
                     l.appearanceDates.add(date);
             }
         }

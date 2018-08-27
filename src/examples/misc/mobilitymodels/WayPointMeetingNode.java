@@ -1,6 +1,7 @@
 package examples.misc.mobilitymodels;
 
 import jbotsim.Node;
+import jbotsim.PRNG;
 import jbotsim.Point;
 import jbotsim.Topology;
 import jbotsimx.ui.JViewer;
@@ -27,8 +28,8 @@ public class WayPointMeetingNode extends Node implements ArrivalListener {
             mover.addDestination(300, 50);
         }
         else
-            mover.addDestination(refPoint.getX()+(Math.random()*100)-50,
-                refPoint.getY()+(Math.random()*100)-50);
+            mover.addDestination(refPoint.getX()+(PRNG.nextDouble()*100)-50,
+                refPoint.getY()+(PRNG.nextDouble()*100)-50);
     }
 
     public static void main(String[] args) {

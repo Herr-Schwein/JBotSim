@@ -1,13 +1,10 @@
 package examples.centralized;
 
-import jbotsim.Color;
-import java.util.Random;
+import jbotsim.*;
+
 import java.util.Vector;
 
 
-import jbotsim.Link;
-import jbotsim.Node;
-import jbotsim.Topology;
 import jbotsim.event.ConnectivityListener;
 import jbotsim.event.MovementListener;
 import jbotsim.event.TopologyListener;
@@ -34,9 +31,8 @@ public class MultiAggregation implements TopologyListener, ConnectivityListener,
 		topo.addNode(550, 50, new Sink());
 		topo.addNode(550, 350, new Sink());
 		topo.addNode(50, 350, new Sink());
-		Random rand=new Random();
 		for (int i=0; i<40; i++){
-			topo.addNode(50+rand.nextDouble()*500, 50+rand.nextDouble()*300);
+			topo.addNode(50+ PRNG.nextDouble()*500, 50+PRNG.nextDouble()*300);
 		}
 	}
 	public void onNodeAdded(Node n) {

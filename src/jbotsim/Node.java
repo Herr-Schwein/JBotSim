@@ -213,7 +213,6 @@ public class Node extends _Properties implements ClockListener, Comparable<Node>
      * Sets the color of this node.
      */
     public void setIntColor(Integer intColor) {
-        Random r = new Random();
         while (Color.basicColors.size() <= intColor)
             Color.basicColors.add(Color.getRandomColor());
         setColor(Color.basicColors.get(intColor));
@@ -223,8 +222,7 @@ public class Node extends _Properties implements ClockListener, Comparable<Node>
      * Assign a random color to this node.
      */
     public void setRandomColor() {
-        Random r = new Random();
-        setColor(new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
+        setColor(Color.getRandomColor());
     }
 
     /**

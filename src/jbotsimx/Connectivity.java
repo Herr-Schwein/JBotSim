@@ -1,19 +1,19 @@
 /*******************************************************************************
  * This file is part of JBotSim.
- * 
+ *
  *     JBotSim is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Lesser General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     JBotSim is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU Lesser General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU Lesser General Public License
  *     along with JBotSim.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     contributors:
  *     Arnaud Casteigts
  *     Jeremie Albert
@@ -24,6 +24,7 @@ import java.util.*;
 
 import jbotsim.Link;
 import jbotsim.Node;
+import jbotsim.PRNG;
 import jbotsim.Topology;
 
 public class Connectivity {
@@ -133,13 +134,13 @@ public class Connectivity {
         double Sr=tp.getSensingRange();
         int size = getOptimalTopologySize(nbNodes, Cr, 100);
         int bordure = new Double(4*Sr).intValue();
-        Random rand = new Random();
         Topology tmp=new Topology();
         tp.pause();
         do{
             tmp.clear();
             for (int i=0; i<nbNodes; i++)
-                tmp.addNode(rand.nextInt(size)+2*bordure, rand.nextInt(size)+1.5*bordure, tp.newInstanceOfModel("default"));
+                tmp.addNode(PRNG.nextInt(size)+2*bordure, PRNG.nextInt(size)+1.5*bordure,
+                            tp.newInstanceOfModel("default"));
         } while (!Connectivity.isConnected(tmp) || Connectivity.isBiconnected(tmp));
         for (Node n:tmp.getNodes())
             tp.addNode(n.getX(), n.getY(), tp.newInstanceOfModel("default"));
@@ -149,14 +150,14 @@ public class Connectivity {
     int size = getOptimalTopologySize(nbNodes, cRange, ratio);
     int bordure = new Double(4*sRange).intValue();
     int attempts = 0;
-    Random rand = new Random();
     Topology topo = new Topology();
     topo.setSensingRange(sRange);
     topo.setCommunicationRange(cRange);
     do{ attempts++;
         topo.clear();
         for (int i=0; i<nbNodes; i++)
-        topo.addNode(rand.nextInt(size)+2*bordure, rand.nextInt(size)+1.5*bordure, topo.newInstanceOfModel("default"));
+        topo.addNode(PRNG.nextInt(size)+2*bordure, PRNG.nextInt(size)+1.5*bordure,
+                    topo.newInstanceOfModel("default"));
     } while (!Connectivity.isConnected(topo) || Connectivity.isBiconnected(topo));
     topo.setProperty("attempts", attempts);
     return topo;

@@ -217,6 +217,6 @@ public class Color {
     }
 
     public static Color getRandomColor() {
-        return new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
+        return new Color(PRNG.nextInt(256), PRNG.nextInt(256), PRNG.nextInt(256));
     }
 }

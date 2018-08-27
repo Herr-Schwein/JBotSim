@@ -3,7 +3,7 @@ package examples.basic.mobilebroadcast;
 import jbotsim.Color;
 import jbotsim.Message;
 import jbotsim.Node;
-
+import jbotsim.PRNG;
 
 
 /**
@@ -15,7 +15,7 @@ public class MobileBroadcastNode extends Node{
 
     @Override
     public void onStart() {
-        setDirection(Math.PI * 2 * Math.random());
+        setDirection(Math.PI * 2 * PRNG.nextDouble());
         informed = false;
         setColor(null); // optional (for restart only)
     }

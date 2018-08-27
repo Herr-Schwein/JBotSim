@@ -1,6 +1,7 @@
 package examples.misc.randomwalks;
 
 import jbotsim.Node;
+import jbotsim.PRNG;
 import jbotsim.Topology;
 import jbotsim.event.ClockListener;
 import jbotsim.event.StartListener;
@@ -8,13 +9,11 @@ import jbotsimx.topology.TopologyGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by acasteig on 17/06/15.
  */
 public class CentralizedRW4 implements ClockListener, StartListener {
-    Random random = new Random();
     Topology tp;
     Node current;
 
@@ -32,7 +31,7 @@ public class CentralizedRW4 implements ClockListener, StartListener {
     @Override
     public void onClock() {
         List<Node> neighbors = current.getNeighbors();
-        current = neighbors.get(random.nextInt(neighbors.size()));
+        current = neighbors.get(PRNG.nextInt(neighbors.size()));
         if (current == tp.getNodes().get(tp.getNodes().size()-1))
             finish();
     }

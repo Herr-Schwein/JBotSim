@@ -33,7 +33,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Random;
 import java.util.Vector;
 
 import jbotsim.Link;

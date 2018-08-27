@@ -1,6 +1,7 @@
 package examples.funny.wolfsheep;
 
 import jbotsim.Node;
+import jbotsim.PRNG;
 
 /**
  * Created by acasteig on 31/08/16.
@@ -13,7 +14,7 @@ public class Wolf extends Node {
         setIcon("wolf.png");
         setSize(20);
         setSensingRange(50);
-        setDirection(Math.random() * Math.PI * 2);
+        setDirection(PRNG.nextDouble() * Math.PI * 2);
     }
 
     @Override
@@ -24,7 +25,7 @@ public class Wolf extends Node {
 
     @Override
     public void onPostClock() {
-        if (Math.random() < 0.005){
+        if (PRNG.nextDouble() < 0.005){
             getTopology().removeNode(this);
         }
     }

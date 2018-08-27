@@ -1,6 +1,7 @@
 package examples.funny.wolfsheep;
 
 import jbotsim.Node;
+import jbotsim.PRNG;
 import jbotsim.Topology;
 
 /**
@@ -14,7 +15,7 @@ public class Sheep extends Node {
     public void onStart() {
         setIcon("sheep.png");
         setSize(12);
-        setDirection(Math.random() * Math.PI * 2);
+        setDirection(PRNG.nextDouble() * Math.PI * 2);
     }
 
     @Override
@@ -28,11 +29,11 @@ public class Sheep extends Node {
         Topology tp = getTopology();
         if ( ! isAlive ) {
             tp.removeNode(this);
-            if (Math.random() < 0.5){
+            if (PRNG.nextDouble() < 0.5){
                 tp.addNode(-1, -1, new Wolf());
             }
         }else{
-            if (Math.random() < 0.01){
+            if (PRNG.nextDouble() < 0.01){
                 tp.addNode(-1, -1, new Sheep());
             }
         }

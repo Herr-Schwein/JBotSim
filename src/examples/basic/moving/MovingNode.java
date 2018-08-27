@@ -1,6 +1,7 @@
 package examples.basic.moving;
 
 import jbotsim.Node;
+import jbotsim.PRNG;
 
 /**
  * Created by acasteig on 2/20/15.
@@ -8,7 +9,7 @@ import jbotsim.Node;
 public class MovingNode extends Node{
     @Override
     public void onStart() {
-        setDirection(Math.random()*2*Math.PI);
+        setDirection(PRNG.nextDouble()*2*Math.PI);
     }
 
     @Override

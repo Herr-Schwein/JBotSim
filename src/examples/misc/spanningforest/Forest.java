@@ -1,14 +1,9 @@
 package examples.misc.spanningforest;
 
-import jbotsim.Link;
-import jbotsim.Node;
-import jbotsim.Topology;
+import jbotsim.*;
 import jbotsim.event.ClockListener;
 import jbotsim.event.ConnectivityListener;
 import jbotsim.event.TopologyListener;
-
-import jbotsim.Color;
-import java.util.Random;
 
 public class Forest implements ClockListener, ConnectivityListener, TopologyListener{
 	Topology tp;
@@ -33,7 +28,7 @@ public class Forest implements ClockListener, ConnectivityListener, TopologyList
 	public void onClock() {
 		int nbLinks = tp.getLinks().size();		
 		if (nbLinks > 0)
-			applyRule(tp.getLinks().get((new Random()).nextInt(nbLinks)));
+			applyRule(tp.getLinks().get(PRNG.nextInt(nbLinks)));
 	}
 
 	@Override
@@ -59,7 +54,7 @@ public class Forest implements ClockListener, ConnectivityListener, TopologyList
 	public void applyRule(Link l) {
 		if(l.endpoints().get(0).getColor() == Color.red
 				&& l.endpoints().get(1).getColor() == Color.red){
-			if (Math.random()<.5)
+			if (PRNG.nextDouble()<.5)
 				setRelation(l.endpoints().get(0), l.endpoints().get(1));
 			else
 				setRelation(l.endpoints().get(1), l.endpoints().get(0));

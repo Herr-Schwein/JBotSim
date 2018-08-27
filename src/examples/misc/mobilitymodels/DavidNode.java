@@ -1,7 +1,7 @@
 package examples.misc.mobilitymodels;
 
+import jbotsim.PRNG;
 import jbotsim.Point;
-import java.util.Random;
 
 import jbotsim.Node;
 import jbotsim.Topology;
@@ -17,8 +17,8 @@ public class DavidNode extends Node{
     }
 
     public void onClock() {
-		double randx = ((new Random()).nextInt(3)-1)/10.0;
-		double randy = ((new Random()).nextInt(3)-1)/10.0;
+		double randx = ((PRNG.nextInt(3)-1)/10.0);
+		double randy = ((PRNG.nextInt(3)-1)/10.0);
 
 		vec.setLocation(vec.getX()+randx, vec.getY()+randy);
         Point next = new Point(getX()+vec.getX(),getY()+vec.getY());
