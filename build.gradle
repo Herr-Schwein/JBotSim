@@ -13,17 +13,17 @@ plugins {
 	id "com.github.johnrengelman.shadow" version "2.0.4"
 }
 
-allprojects {
+subprojects {
 
-apply plugin: "java-library"
+apply plugin: "java"
 apply plugin: "idea"
 
-version = '1.0-alpha26'
-group = "com.github.acasteigts"
 sourceCompatibility = 1.8 // java 8
 targetCompatibility = 1.8
-description = "JBotSim : a simulation library for distributed algorithms in dynamic networks."
 
+description = "JBotSim : a simulation library for distributed algorithms in dynamic networks."
+group = "com.github.acasteigts"
+version = '1.0-alpha26-SNAPSHOT'
 
 repositories {
     jcenter()
@@ -38,6 +38,35 @@ dependencies{
 	testImplementation "junit:junit:4+"
 }
 
+
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+uploadArchives {
+    repositories {
+        flatDir {
+            name 'fileRepo'
+            def releasesRepoUrl = rootProject.file("repos/releases")
+            def snapshotsRepoUrl = rootProject.file("repos/snapshots")
+            def repoUrl = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            dirs "$repoUrl"
+        }
+    }
+
+}
 }
 
 project(':jbotsim') {
@@ -67,6 +96,7 @@ project(':jbotsimx') {
     shadowJar{
 	  baseName = "jbotsim"
 	}
+	build.dependsOn(shadowJar);
 }
 
 
@@ -93,7 +123,7 @@ project(':examples'){
     shadowJar{
 	  baseName = "jbotsim-full"
 	}
-	
+	build.dependsOn(shadowJar);
 	//Create a run task for each example in the examples directory:
 
 	task createAllExamplesScripts(group: "Application", description: "Create the examples binaries as scripts.") << {
