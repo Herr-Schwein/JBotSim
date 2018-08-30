@@ -29,6 +29,11 @@ repositories {
     jcenter()
 }
 
+configurations{
+	jbotsimCoreCompile
+	jbotsimCompile
+}
+
 dependencies{
 	testImplementation "junit:junit:4+"
 }
