@@ -43,6 +43,10 @@ project(':jbotsim') {
       from("src/main/java") {into "jbotsim"}
       excludes = ["**/*.java"]
 	}
+	
+	jar{
+	  baseName = "jbotsim-core"
+    }
 }
 
 project(':jbotsimx') {
@@ -56,6 +60,10 @@ project(':jbotsimx') {
     processResources {
       from("src/main/java") {into "jbotsimx"}
       excludes = ["**/*.java"]
+	}
+	
+    shadowJar{
+	  baseName = "jbotsim"
 	}
 }
 
