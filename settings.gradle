@@ -1,2 +1,2 @@
-rootProject.name = 'jbotsim'
-include 'jbotsim-core', 'jbotsimx', 'jbotsim-examples'
+rootProject.name = 'jbotsim-all'
+include 'jbotsim', 'jbotsimx', 'examples'
