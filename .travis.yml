@@ -14,6 +14,7 @@ script:
 - "./gradlew build"
 - "./gradlew javadoc"
 - "./gradlew jar"
+- "./gradlew shadowJar"
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/

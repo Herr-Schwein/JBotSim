@@ -13,20 +13,15 @@ plugins {
 	id "com.github.johnrengelman.shadow" version "2.0.4"
 }
 
+allprojects {
 
 apply plugin: "java-library"
-apply plugin: "application"
 apply plugin: "idea"
-apply plugin: "com.github.johnrengelman.shadow"
-
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 version = '1.0-alpha26'
 group = "com.github.acasteigts"
 sourceCompatibility = 1.8 // java 8
 targetCompatibility = 1.8
-applicationName = "jbotsimAll"
-mainClassName = "examples.basic.helloworld.Main"
 description = "JBotSim : a simulation library for distributed algorithms in dynamic networks."
 
 
@@ -34,172 +29,94 @@ repositories {
     mavenCentral()
 }
 
-configurations{
-	jbotsimCoreCompile
-	jbotsimCompile
-}
-
-dependencies {
-	api 'guru.nidi:graphviz-java:0.5+'
-	jbotsimCompile 'guru.nidi:graphviz-java:0.5+'
+dependencies{
 	testImplementation "junit:junit:4+"
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = [ "src" ]
-        }
-        resources {
-            srcDir "src"
-            exclude "Makefile"
-        }
+}
+
+project(':jbotsim') {
+    processResources {
+      from("src/main/java") {into "jbotsim"}
+      excludes = ["**/*.java"]
+	}
+}
+
+project(':jbotsimx') {
+
+    apply plugin: "com.github.johnrengelman.shadow"
+
+    dependencies {
+        compile project(':jbotsim'), 'guru.nidi:graphviz-java:0.5+'
     }
 
-    jbotsimCore {
-        java {
-            srcDirs = main.java.srcDirs
-            include "jbotsim/**/*.java"
-        }
-        resources {
-            srcDirs = main.resources.srcDirs
-            include "jbotsim/"
-        }
+    processResources {
+      from("src/main/java") {into "jbotsimx"}
+      excludes = ["**/*.java"]
+	}
+}
+
+
+project(':examples'){
+
+    apply plugin: "com.github.johnrengelman.shadow"
+    apply plugin: "application"
+    applicationName = "jbotsim-examples"
+    mainClassName = "examples.basic.helloworld.Main"
+
+    dependencies {
+        compile project(':jbotsim'), project(':jbotsimx'), 'guru.nidi:graphviz-java:0.5+'
     }
-
-    jbotsim {
-        java {
-            srcDirs = main.java.srcDirs
-            include "jbotsim/**/*.java"
-            include "jbotsimx/**/*.java"
-        }
-        resources {
-            srcDirs = main.resources.srcDirs
-            include "jbotsim/"
-            include "jbotsimx/"
-            include "META-INF/"
-        }
+    
+    processResources {
+      from("src/main/java") {into "examples"}
+      excludes = ["**/*.java"]
+	}
+	
+	jar{
+	  baseName = "jbotsim-examples"
     }
+    
+    shadowJar{
+	  baseName = "jbotsim-full"
+	}
+	
+	//Create a run task for each example in the examples directory:
 
-    test {
-        java {
-            srcDirs = [ "test/java"]
-        }
-        resources {
-            srcDirs = [ "test/resources" ]
-        }
-    }
-}
+	task createAllExamplesScripts(group: "Application", description: "Create the examples binaries as scripts.") << {
+	}
 
-//Copy dependencies in the libs directory
-task libs(type: Sync) {
-    description = "Copy all dependencies used during compilation in the libs directrory"
-    from configurations.compileClasspath
-    from configurations.testCompileClasspath
-    into "$buildDir/output/libs"
-}
-build.finalizedBy(libs)
-
-// to prevent errors with french comments
-compileJava.options.encoding = 'UTF-8'
-compileJbotsimJava.options.encoding = 'UTF-8'
-compileJbotsimCoreJava.options.encoding = 'UTF-8'
-
-
-task jbotsimCoreJar(type: Jar, group: "Build", description: "Assembles a jar archive containing the jbotsim core classes only."){
-    baseName = "jbotsim-core"
-	from sourceSets.jbotsimCore.output
-}
-
-task jbotsimCoreShadowJar(type: ShadowJar, group: "Shadow",
- description: "Create a combined JAR of jbotsim core and runtime dependencies."){
-    baseName = "jbotsim-core-fat"
-	from sourceSets.jbotsimCore.output
-	configurations = [project.configurations.jbotsimCoreCompile]
-}
-
-task jbotsimJar(type: Jar, group: "Build", description: "Assembles a jar archive containing the jbotsim classes only."){
-	baseName = "jbotsim"
-	from sourceSets.jbotsim.output
-}
-
-task jbotsimShadowJar(type: ShadowJar, group: "Shadow",
- description: "Create a combined JAR of jbotsim and runtime dependencies."){
-    baseName = "jbotsim-fat"
-	from sourceSets.jbotsim.output
-	configurations = [project.configurations.jbotsimCompile]
-}
-
-jar{
-	baseName = "jbotsim-all"
-	from sourceSets.main.output
-}
-
-shadowJar{
-	baseName = "jbotsim-all-fat"
-	from sourceSets.main.output
-}
-
-jar.finalizedBy jbotsimCoreJar
-jar.finalizedBy jbotsimJar
-shadowJar.finalizedBy jbotsimCoreShadowJar
-shadowJar.finalizedBy jbotsimShadowJar
-
-
-task jbotsimCoreDoc(type: Javadoc, group: "Documentation", description: "Generate Javadoc API documentation for jbotsim-core only.") {
-  source = sourceSets.jbotsimCore.allJava
-  destinationDir = file("$buildDir/docs/jbotsim-core")
-}
-
-task jbotsimDoc(type: Javadoc, group: "Documentation", description: "Generate Javadoc API documentation for jbotsim only.") {
-  source = sourceSets.jbotsim.allJava
-  destinationDir = file("$buildDir/docs/jbotsim")
-}
-
-javadoc.finalizedBy jbotsimCoreDoc
-javadoc.finalizedBy jbotsimDoc
-
-//Create a run task for each example in the examples directory:
-
-task createAllExamplesScripts(group: "Application", description: "Create the examples binaries as scripts.") << {
-}
-
-def scripts = [:]
-def srcDirectoryPath = "${project.rootDir}" + File.separator + "src" + File.separator
-def examplesDirectoryPath = srcDirectoryPath + "examples" + File.separator
-
-ext.visitFileExamplesTree = { inputRelativeExampleDirectoryPath ->
-  fileTree(examplesDirectoryPath + inputRelativeExampleDirectoryPath).visit{
+	def scripts = [:]
+	def srcDirectoryPath = "${projectDir}" + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator
+	println(srcDirectoryPath)
+  	fileTree(srcDirectoryPath).visit{
     details -> 
     if(details.file.isFile()){
       if(details.file.text.contains("public static void main(")){
          def name = details.file.getName().substring(0, details.file.getName().lastIndexOf('.'))
          def relativePath = details.file.getPath()
          relativePath = relativePath.replace(srcDirectoryPath, '').replace(File.separator, '.').replace('.java', '')
-         scripts.put(name, relativePath)
+         scripts.put(name, "examples." + relativePath)
+        }
       }
     }
-  }
-}
 
-fileTree("${project.rootDir}" + File.separator + "src" + File.separator + "examples" ).visit{
-		items -> visitFileExamplesTree(items.file.getName())
-}
 
-scripts.each() { scriptName, className ->
-  def t = tasks.create(name: scriptName+'StartScript', type: CreateStartScripts) {
+  scripts.each() { scriptName, className ->
+    def t = tasks.create(name: scriptName+'StartScript', type: CreateStartScripts) {
       mainClassName = className
       applicationName = scriptName
       outputDir = new File(project.buildDir, 'scripts')
       classpath = jar.outputs.files + project.configurations.runtime
+    }
+    createAllExamplesScripts.dependsOn(t)
+    def r = tasks.create(name: 'run' + scriptName.substring(0, 1).toUpperCase() + scriptName.substring(1),
+     type: JavaExec, group: "Application", description: "Run " + scriptName + " example.") {
+      classpath sourceSets.main.runtimeClasspath
+      main = className
+    }
+    r.dependsOn(t)
   }
-  createAllExamplesScripts.dependsOn(t)
-  def r = tasks.create(name: 'run' + scriptName.substring(0, 1).toUpperCase() + scriptName.substring(1),
-   type: JavaExec, group: "Application", description: "Run " + scriptName + " example.") {
-    classpath sourceSets.main.runtimeClasspath
-    main = className
-  }
-  r.dependsOn(t)
 }
 
 
