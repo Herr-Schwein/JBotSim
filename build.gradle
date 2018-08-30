@@ -1,8 +1,25 @@
-plugins { id "org.ajoberstar.grgit" version "3.0.0-beta.1" }
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
+  }
+}
 
-apply plugin: "java"
+plugins { 
+	id "com.github.johnrengelman.shadow" version "2.0.4"
+}
+
+
+apply plugin: "java-library"
 apply plugin: "application"
 apply plugin: "idea"
+apply plugin: "com.github.johnrengelman.shadow"
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 version = '1.0-alpha26'
 group = "com.github.acasteigts"
@@ -17,43 +34,16 @@ repositories {
     mavenCentral()
 }
 
-/**
- * Clone GIT repo of Graphviz-Java
- */
-task cloneGraphvizJava {
-    project.ext.dotparserDir = buildDir.toString() +"/dotparser"
-    if (! file(project.ext.dotparserDir).exists ()) {
-        project.ext.dotParserRepo = grgit.clone {
-            dir = project.ext.dotparserDir
-            uri = "https://github.com/nidi3/graphviz-java.git"
-            refToCheckout = "master"
-        }
-    }
+configurations{
+	jbotsimCoreCompile
+	jbotsimCompile
 }
 
-task copyDotParserToSrc (type: Copy) {
-    def baseDir = project.ext.dotparserDir.toString()+ "/graphviz-java/src/main/java"
-    def dstDir = "src/"
-
-    from (baseDir) {
-        exclude "**/engine"
-        exclude "**/service"
-    }
-    into (dstDir)
-
-    dependsOn cloneGraphvizJava
-    enabled = ! file(dstDir+"/guru").exists()
+dependencies {
+	api 'guru.nidi:graphviz-java:0.5+'
+	jbotsimCompile 'guru.nidi:graphviz-java:0.5+'
+	testImplementation "junit:junit:4+"
 }
-
-compileJava.dependsOn copyDotParserToSrc
-tasks.idea.dependsOn(cleanIdea)
-tasks.idea.dependsOn(copyDotParserToSrc)
-
-task cleanDotParserSources(type: Delete) {
-    delete "src/guru"
-}
-
-clean.dependsOn cleanDotParserSources
 
 sourceSets {
     main {
@@ -62,6 +52,7 @@ sourceSets {
         }
         resources {
             srcDir "src"
+            exclude "Makefile"
         }
     }
 
@@ -72,7 +63,7 @@ sourceSets {
         }
         resources {
             srcDirs = main.resources.srcDirs
-            include "jbotsim/**/*"
+            include "jbotsim/"
         }
     }
 
@@ -81,13 +72,12 @@ sourceSets {
             srcDirs = main.java.srcDirs
             include "jbotsim/**/*.java"
             include "jbotsimx/**/*.java"
-            include "guru/**/*.java"
         }
         resources {
             srcDirs = main.resources.srcDirs
             include "jbotsim/"
             include "jbotsimx/"
-            include "guru/"
+            include "META-INF/"
         }
     }
 
@@ -100,19 +90,44 @@ sourceSets {
         }
     }
 }
+
+//Copy dependencies in the libs directory
+task libs(type: Sync) {
+    description = "Copy all dependencies used during compilation in the libs directrory"
+    from configurations.compileClasspath
+    from configurations.testCompileClasspath
+    into "$buildDir/output/libs"
+}
+build.finalizedBy(libs)
+
 // to prevent errors with french comments
 compileJava.options.encoding = 'UTF-8'
 compileJbotsimJava.options.encoding = 'UTF-8'
 compileJbotsimCoreJava.options.encoding = 'UTF-8'
 
-task jbotsimCoreJar(type: Jar){
+
+task jbotsimCoreJar(type: Jar, group: "Build", description: "Assembles a jar archive containing the jbotsim core classes only."){
     baseName = "jbotsim-core"
 	from sourceSets.jbotsimCore.output
 }
 
-task jbotsimJar(type: Jar){
+task jbotsimCoreShadowJar(type: ShadowJar, group: "Shadow",
+ description: "Create a combined JAR of jbotsim core and runtime dependencies."){
+    baseName = "jbotsim-core-fat"
+	from sourceSets.jbotsimCore.output
+	configurations = [project.configurations.jbotsimCoreCompile]
+}
+
+task jbotsimJar(type: Jar, group: "Build", description: "Assembles a jar archive containing the jbotsim classes only."){
 	baseName = "jbotsim"
 	from sourceSets.jbotsim.output
+}
+
+task jbotsimShadowJar(type: ShadowJar, group: "Shadow",
+ description: "Create a combined JAR of jbotsim and runtime dependencies."){
+    baseName = "jbotsim-fat"
+	from sourceSets.jbotsim.output
+	configurations = [project.configurations.jbotsimCompile]
 }
 
 jar{
@@ -120,15 +135,23 @@ jar{
 	from sourceSets.main.output
 }
 
+shadowJar{
+	baseName = "jbotsim-all-fat"
+	from sourceSets.main.output
+}
+
 jar.finalizedBy jbotsimCoreJar
 jar.finalizedBy jbotsimJar
+shadowJar.finalizedBy jbotsimCoreShadowJar
+shadowJar.finalizedBy jbotsimShadowJar
 
-task jbotsimCoreDoc(type: Javadoc) {
+
+task jbotsimCoreDoc(type: Javadoc, group: "Documentation", description: "Generate Javadoc API documentation for jbotsim-core only.") {
   source = sourceSets.jbotsimCore.allJava
   destinationDir = file("$buildDir/docs/jbotsim-core")
 }
 
-task jbotsimDoc(type: Javadoc) {
+task jbotsimDoc(type: Javadoc, group: "Documentation", description: "Generate Javadoc API documentation for jbotsim only.") {
   source = sourceSets.jbotsim.allJava
   destinationDir = file("$buildDir/docs/jbotsim")
 }
@@ -136,90 +159,47 @@ task jbotsimDoc(type: Javadoc) {
 javadoc.finalizedBy jbotsimCoreDoc
 javadoc.finalizedBy jbotsimDoc
 
-//Create a binary for each example :
+//Create a run task for each example in the examples directory:
 
-task createAllStartScripts() << {
-     // just a placeholder
+task createAllExamplesScripts(group: "Application", description: "Create the examples binaries as scripts.") << {
 }
-  def scripts = [:]
-  fileTree("${project.rootDir}" + File.separator + "src" + File.separator + "examples" + File.separator + "basic").visit{
-    details -> if(details.isDirectory()){
-      scripts.put(details.file.getName(), "examples.basic." + details.file.getName() + ".Main")
+
+def scripts = [:]
+def srcDirectoryPath = "${project.rootDir}" + File.separator + "src" + File.separator
+def examplesDirectoryPath = srcDirectoryPath + "examples" + File.separator
+
+ext.visitFileExamplesTree = { inputRelativeExampleDirectoryPath ->
+  fileTree(examplesDirectoryPath + inputRelativeExampleDirectoryPath).visit{
+    details -> 
+    if(details.file.isFile()){
+      if(details.file.text.contains("public static void main(")){
+         def name = details.file.getName().substring(0, details.file.getName().lastIndexOf('.'))
+         def relativePath = details.file.getPath()
+         relativePath = relativePath.replace(srcDirectoryPath, '').replace(File.separator, '.').replace('.java', '')
+         scripts.put(name, relativePath)
+      }
     }
   }
-  scripts.each() { scriptName, className ->
-          def t = tasks.create(name: scriptName+'StartScript', type: CreateStartScripts) {
-        mainClassName = className
-        applicationName = scriptName
-        outputDir = new File(project.buildDir, 'scripts')
-        classpath = jar.outputs.files + project.configurations.runtime
-    }
-    createAllStartScripts.dependsOn(t)
+}
+
+fileTree("${project.rootDir}" + File.separator + "src" + File.separator + "examples" ).visit{
+		items -> visitFileExamplesTree(items.file.getName())
+}
+
+scripts.each() { scriptName, className ->
+  def t = tasks.create(name: scriptName+'StartScript', type: CreateStartScripts) {
+      mainClassName = className
+      applicationName = scriptName
+      outputDir = new File(project.buildDir, 'scripts')
+      classpath = jar.outputs.files + project.configurations.runtime
   }
-
-/**
- * Tests
- */
-
-// Non-standard location of tests
-sourceSets {
-    test {
-    }
-
-    jbotsimJarTest {
-        java.srcDirs = test.java.srcDirs
-        resources.srcDirs = test.resources.srcDirs
-        compileClasspath += jbotsimJar.outputs.files
-        runtimeClasspath += jbotsimJar.outputs.files
-    }
-
-}
-
-dependencies {
-    testImplementation 'junit:junit:4.12'
-    jbotsimJarTestImplementation 'junit:junit:4.12'
-}
-
-configurations {
-    jbotsimJarTestImplementation.extendsFrom implementation
-    jbotsimJarTestRuntimeOnly.extendsFrom runtimeOnly
-}
-
-def commonTestSettings = {
-    useJUnit ()
-    testLogging {
-        warn {
-            events = [ "passed", "failed", "skipped" ]
-            showCauses = true
-            showStackTraces = true
-            showExceptions = true
-            exceptionFormat = "full"
-        }
-    }
-
-    filter {
-        includeTestsMatching "*"
-    }
-
-    doLast {
-        String outDirName = rootDir.toPath().relativize(project.testReportDir.toPath()).toString()
-        println ()
-        println ("View test report in: " + outDirName +  File.separator + name + File.separator + "index.html")
-    }
-}
-
-test {
-    configure commonTestSettings
-}
-
-task jbotsimJarTest (type : Test) {
-    configure commonTestSettings
-    testClassesDirs = sourceSets.jbotsimJarTest.output.classesDirs
-    classpath = sourceSets.jbotsimJarTest.runtimeClasspath
-    shouldRunAfter test
-
-    println(classpath.files)
+  createAllExamplesScripts.dependsOn(t)
+  def r = tasks.create(name: 'run' + scriptName.substring(0, 1).toUpperCase() + scriptName.substring(1),
+   type: JavaExec, group: "Application", description: "Run " + scriptName + " example.") {
+    classpath sourceSets.main.runtimeClasspath
+    main = className
+  }
+  r.dependsOn(t)
 }
 
 
-check.dependsOn jbotsimJarTest
