@@ -15,69 +15,64 @@ plugins {
 
 subprojects {
 
-apply plugin: "java"
-apply plugin: "idea"
+    apply plugin: "java"
+    apply plugin: "idea"
 
-sourceCompatibility = 1.8 // java 8
-targetCompatibility = 1.8
+    sourceCompatibility = 1.8 // java 8
+    targetCompatibility = 1.8
 
-description = "JBotSim : a simulation library for distributed algorithms in dynamic networks."
-group = "com.github.acasteigts"
-version = '1.0-alpha26-SNAPSHOT'
+    description = "JBotSim : a simulation library for distributed algorithms in dynamic networks."
+    group = "com.github.acasteigts"
+    version = '1.0-alpha26-SNAPSHOT'
 
-repositories {
-    jcenter()
-}
-
-configurations{
-	jbotsimCoreCompile
-	jbotsimCompile
-}
-
-dependencies{
-	testImplementation "junit:junit:4+"
-}
-
-
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
-
-uploadArchives {
     repositories {
-        flatDir {
-            name 'fileRepo'
-            def releasesRepoUrl = rootProject.file("repos/releases")
-            def snapshotsRepoUrl = rootProject.file("repos/snapshots")
-            def repoUrl = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            dirs "$repoUrl"
-        }
+        jcenter()
     }
 
-}
+    dependencies{
+        testImplementation "junit:junit:4+"
+    }
+
+
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
+    }
+
+    uploadArchives {
+        repositories {
+            flatDir {
+                name 'fileRepo'
+                def releasesRepoUrl = rootProject.file("repos/releases")
+                def snapshotsRepoUrl = rootProject.file("repos/snapshots")
+                def repoUrl = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                dirs "$repoUrl"
+            }
+        }
+
+    }
+
+    clean.doFirst {
+        delete rootProject.file("repos")
+    }
 }
 
-project(':jbotsim') {
+project(':jbotsim-core') {
     processResources {
-      from("src/main/java") {into "jbotsim"}
+      from("src/main/java")
       excludes = ["**/*.java"]
 	}
-	
-	jar{
-	  baseName = "jbotsim-core"
-    }
 }
 
 project(':jbotsimx') {
@@ -85,22 +80,22 @@ project(':jbotsimx') {
     apply plugin: "com.github.johnrengelman.shadow"
 
     dependencies {
-        compile project(':jbotsim'), 'guru.nidi:graphviz-java:0.5+'
+        compile project(':jbotsim-core'), 'guru.nidi:graphviz-java:0.5+'
     }
 
     processResources {
-      from("src/main/java") {into "jbotsimx"}
+      from("src/main/java")
       excludes = ["**/*.java"]
 	}
-	
+
     shadowJar{
 	  baseName = "jbotsim"
 	}
-	build.dependsOn(shadowJar);
+	build.dependsOn(shadowJar)
 }
 
 
-project(':examples'){
+project(':jbotsim-examples'){
 
     apply plugin: "com.github.johnrengelman.shadow"
     apply plugin: "application"
@@ -108,29 +103,34 @@ project(':examples'){
     mainClassName = "examples.basic.helloworld.Main"
 
     dependencies {
-        compile project(':jbotsim'), project(':jbotsimx'), 'guru.nidi:graphviz-java:0.5+'
+        compile project(':jbotsim-core'), project(':jbotsimx'), 'guru.nidi:graphviz-java:0.5+'
     }
     
     processResources {
-      from("src/main/java") {into "examples"}
+      from("src/main/java")
       excludes = ["**/*.java"]
 	}
 	
-	jar{
-	  baseName = "jbotsim-examples"
-    }
-    
     shadowJar{
-	  baseName = "jbotsim-full"
+        baseName = "jbotsim-full"
 	}
-	build.dependsOn(shadowJar);
+	build.dependsOn(shadowJar)
+
+    configurations.archives.with {
+        //artifacts.remove artifacts.find { it.archiveTask.is distZip }
+        //artifacts.remove artifacts.find { it.archiveTask.is distTar }
+        artifacts.remove artifacts.find { it.archiveTask.is shadowDistZip }
+        artifacts.remove artifacts.find { it.archiveTask.is shadowDistTar }
+    }
+
 	//Create a run task for each example in the examples directory:
 
 	task createAllExamplesScripts(group: "Application", description: "Create the examples binaries as scripts.") << {
 	}
 
 	def scripts = [:]
-	def srcDirectoryPath = "${projectDir}" + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator
+	def srcDirectoryPath = "${projectDir}" + File.separator + "src" + File.separator + "main" + File.separator +
+            "java" + File.separator + "examples" + File.separator
 	println(srcDirectoryPath)
   	fileTree(srcDirectoryPath).visit{
     details -> 
@@ -147,10 +147,10 @@ project(':examples'){
 
   scripts.each() { scriptName, className ->
     def t = tasks.create(name: scriptName+'StartScript', type: CreateStartScripts) {
-      mainClassName = className
-      applicationName = scriptName
-      outputDir = new File(project.buildDir, 'scripts')
-      classpath = jar.outputs.files + project.configurations.runtime
+        mainClassName = className
+        applicationName = scriptName
+        classpath = startScripts.classpath
+        outputDir = startScripts.outputDir
     }
     createAllExamplesScripts.dependsOn(t)
     def r = tasks.create(name: 'run' + scriptName.substring(0, 1).toUpperCase() + scriptName.substring(1),
@@ -159,7 +159,12 @@ project(':examples'){
       main = className
     }
     r.dependsOn(t)
-  }
+    applicationDistribution.into("bin") {
+      duplicatesStrategy= DuplicatesStrategy.EXCLUDE
+      from(t)
+      fileMode = 0755
+    }
+    }
 }
 
 

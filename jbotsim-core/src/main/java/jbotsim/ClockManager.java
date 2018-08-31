@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ClockManager {
-    Topology tp;
+    jbotsim.Topology tp;
     HashMap<ClockListener, Integer> listeners = new HashMap<>();
     HashMap<ClockListener, Integer> countdown = new HashMap<>();
     Class<? extends Clock> clockModel = null;
