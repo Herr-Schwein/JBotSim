@@ -23,7 +23,7 @@ subprojects {
 
     description = "JBotSim : a simulation library for distributed algorithms in dynamic networks."
     group = "com.github.acasteigts"
-    version = '1.0-alpha26-SNAPSHOT'
+    version = '1.0-beta01-SNAPSHOT'
 
     repositories {
         jcenter()
