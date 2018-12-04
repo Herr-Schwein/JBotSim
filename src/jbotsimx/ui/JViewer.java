@@ -111,6 +111,7 @@ public class JViewer implements CommandListener, ChangeListener, PropertyListene
             window.addKeyListener(jtp.handler);
             window.pack();
             window.setVisible(true);
+            window.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
             window.addComponentListener(new ComponentAdapter() {
                 public void componentResized(ComponentEvent e) {
                     jtp.topo.setDimensions(jtp.getWidth(), jtp.getHeight());
