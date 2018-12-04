@@ -33,8 +33,7 @@ public class myTopology extends Topology {
             if (cur == null) {
                 return;
             }
-            cur.setSize(SNAKE_NODE_SIZE);
-            cur.setColor(Color.GREEN);
+
             cur.flag = num;
             snakeNodes.add(cur);
             for (int i = 1; i < len; ++i) {
@@ -44,11 +43,7 @@ public class myTopology extends Topology {
                 }
                 snakeNodes.add(next);
                 Link l = cur.getCommonLinkWith(next);
-                l.setColor(Color.RED);
-                l.setWidth(SNAKE_LINK_WIDTH);
                 snakeLinks.add(l);
-                next.setColor(Color.RED);
-                next.setSize(SNAKE_NODE_SIZE);
                 next.flag = num;
                 cur = next;
             }
@@ -94,7 +89,6 @@ public class myTopology extends Topology {
                         if (!tmp.isWaiting) {
                             return next_node;
                         }
-
                     }
                 }
             }
@@ -133,22 +127,27 @@ public class myTopology extends Topology {
                         }
 
                         if (snakeSize < len) {
+                            // clear flag
+                            for (Node n : s.snakeNodes) {
+                                n.flag = -1;
+                            }
                             continue; // rebuild the snake
                         } else {
+                            drawSnake(s);
                             snake_map.put(num, s);
                             break;
                         }
                     }
 
                     if (retry == maxTry) {
-                        System.out.println("Cannot replace a snake.");
+                        //System.out.println("Cannot replace a snake.");
                         return;
                     }
 
                     return;
                 }
                 if (next_head.flag != -1) {
-                    System.out.println("Head stop.");
+                    //System.out.println("Head stop.");
                     // wait for merging
                     if (next_head.isTail) {
                         // merge without waiting
@@ -180,7 +179,7 @@ public class myTopology extends Topology {
                 this.isMoveComplete = false;
                 ++cur_node_index;
             } else {
-                System.out.println("Head waiting.");
+                //System.out.println("Head waiting.");
                 if (cur_head.mergingNode.flag == -1) {
                     // another snake replaced, free the waiting snake
                     for (Node n : snakeNodes) {
@@ -337,7 +336,7 @@ public class myTopology extends Topology {
 
     public myTopology(int len, int num) {
         super(1280, 720);
-        generateTriangleGrid(20, 15);
+        generateTriangleGrid(15, 10);
         snake_map = new HashMap<>(num);
         int retry = 0;
         for (int i = 0; i < num && retry < maxTry; ++i, ++retry) {
@@ -349,9 +348,14 @@ public class myTopology extends Topology {
             }
 
             if (snakeSize < len) {
+                // clear flag
+                for (Node n : s.snakeNodes) {
+                    n.flag = -1;
+                }
                 --i; // rebuild the snake
             } else {
-                System.out.println("Snake " + i + " len " + snakeSize);
+                //System.out.println("Snake " + i + " len " + snakeSize);
+                drawSnake(s);
                 snake_map.put(i, s);
             }
         }
@@ -361,9 +365,24 @@ public class myTopology extends Topology {
         }
 
         setClockModel(new UtilClock(getClockManager()).getClass());
-        setClockSpeed(100);
+        setClockSpeed(300);
         start();
         isInitialize = true;
+    }
+
+    public void drawSnake(Snake s) {
+        s.snakeNodes.get(0).setSize(SNAKE_NODE_SIZE);
+        s.snakeNodes.get(0).setColor(Color.GREEN);
+
+        for (int i = 1; i < s.snakeNodes.size(); ++i) {
+            s.snakeNodes.get(i).setSize(SNAKE_NODE_SIZE);
+            s.snakeNodes.get(i).setColor(Color.RED);
+        }
+
+        for (Link l : s.snakeLinks) {
+            l.setWidth(SNAKE_LINK_WIDTH);
+            l.setColor(Color.RED);
+        }
     }
 
     @Override
@@ -372,8 +391,8 @@ public class myTopology extends Topology {
         for (Iterator<Map.Entry<Integer, Snake>> it = snake_map.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Integer, Snake> entry = it.next();
             Snake s = entry.getValue();
-            //if (s.isMerged) continue;
-            System.out.println("Snake " + s.num + " key " + entry.getKey() + " len " + s.snakeNodes.size());
+
+            //System.out.println("Snake " + s.num + " key " + entry.getKey() + " len " + s.snakeNodes.size());
             if (s.isMoveComplete) {
                 s.moveHead(s.snakeNodes.get(0));
             } else {
