@@ -36,9 +36,12 @@ public class Node extends _Properties implements ClockListener, Comparable<Node>
     Integer ID = -1;
     int size = DEFAULT_SIZE;
     public int flag = -1;
-    public boolean isTail = false;
+    public boolean isLast = false;
     public boolean isWaiting = false;
     public Node mergingNode = null;
+    public boolean isHead = true;
+    public int x;
+    public int y;
 
     /**
      * Returns the identifier of this node.
