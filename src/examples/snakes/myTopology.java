@@ -29,7 +29,7 @@ public class myTopology extends Topology {
     public Node[][] mynodes;
 
     public myTopology(int len, int num) {
-        super(1280, 720);
+        super(1400, 800);
         total_num = num;
         xOrder = 2 * total_num + 5;
         yOrder = (int) ((Math.sqrt(16 * total_num + 1) - 1) / 2) * 2 + 1;
@@ -73,7 +73,7 @@ public class myTopology extends Topology {
         }
 
         setClockModel(new UtilClock(getClockManager()).getClass());
-        setClockSpeed(500);
+        setClockSpeed(150);
         start();
         isInitialize = true;
     }
@@ -81,10 +81,10 @@ public class myTopology extends Topology {
     public void generateTriangleGrid(int orderX, int orderY) {
         TopologyGeneratorFactory gf = new TopologyGeneratorFactory();
         gf.setAbsoluteCoords(true);
-        gf.setX(50);
-        gf.setY(50);
-        gf.setWidth(getWidth() - 50);
-        gf.setHeight(getWidth() - 50);
+        gf.setX(10);
+        gf.setY(10);
+        gf.setWidth(getWidth() - 10);
+        gf.setHeight(getWidth() - 10);
         gf.setWired(true);
         gf.setNodeClass(getNodeModel("default"));
         new TriangleGridGenerator(orderX, orderY).generate(this, gf);
@@ -153,13 +153,16 @@ public class myTopology extends Topology {
                 straightLen = total_num + 2;
                 step = (int) ((Math.sqrt(16 * total_num + 1) - 1) / 2);
                 count = step;
-                setStraighting(s);
+                //setStraighting(s);
                 return;
             }
             //System.out.println("Snake " + s.num + " key " + entry.getKey() + " len " + s.snakeNodes.size());
             Node head = s.snakeNodes.get(0);
             s.moveHead(head);
-            if (s.isReset) continue;
+            if (s.isReset) {
+                s.isReset = false;
+                continue;
+            }
             s.moveBody();
             if (s.isMergeReady) {
                 // merge the snake to another one
@@ -183,7 +186,7 @@ public class myTopology extends Topology {
 
         s1.snakeNodes.addAll(s2.snakeNodes);
         s1.size += s2.size;
-        //System.out.println("Snake " + s1.num + " merged to snake " + s2.num);
+        //System.out.println("Snake " + s2.num + " merged to snake " + s1.num);
     }
 
     private class Snake {
@@ -209,6 +212,7 @@ public class myTopology extends Topology {
             cur.flag = num;
             cur.isHead = true;
             cur.isWaiting = false;
+            cur.isLast = false;
             snakeNodes.add(cur);
 
 
@@ -222,6 +226,7 @@ public class myTopology extends Topology {
                 next.flag = num;
                 next.isHead = true;
                 next.isWaiting = false;
+                next.isLast = false;
                 cur = next;
             }
 
@@ -293,7 +298,7 @@ public class myTopology extends Topology {
                     return;
                 }
                 if (next_head.flag != -1) {
-                    //System.out.println("Snake " + num + " head at " + cur_head.getID() + " stops for snake " + next_head.flag + " head at " + next_head.getID());
+                    //System.out.println("Snake " + num + " head at " + cur_head.getID() + " stops for snake " + next_head.flag + " at " + next_head.getID());
                     // wait for merging
                     cur_head.setColor(Color.RED);
                     if (next_head.isLast) {
@@ -364,7 +369,7 @@ public class myTopology extends Topology {
             }
 
             if (retry == maxTry) {
-                ////System.out.println("Cannot replace a snake.");
+                //System.out.println("Cannot replace a snake.");
                 return -1;
             }
             return 0;
