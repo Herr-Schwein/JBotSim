@@ -32,7 +32,7 @@ public class Topology extends _Properties implements ClockListener {
     List<StartListener> startListeners = new ArrayList<>();
     MessageEngine messageEngine = null;
     Scheduler scheduler;
-    List<Node> nodes = new ArrayList<>();
+    public List<Node> nodes = new ArrayList<>();
     List<Link> arcs = new ArrayList<>();
     List<Link> edges = new ArrayList<>();
     HashMap<String, Class<? extends Node>> nodeModels = new HashMap<String, Class<? extends Node>>();

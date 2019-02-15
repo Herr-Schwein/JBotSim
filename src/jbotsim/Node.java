@@ -40,6 +40,8 @@ public class Node extends _Properties implements ClockListener, Comparable<Node>
     public boolean isWaiting = false;
     public Node mergingNode = null;
     public boolean isHead = true;
+    public int x;
+    public int y;
 
     /**
      * Returns the identifier of this node.
