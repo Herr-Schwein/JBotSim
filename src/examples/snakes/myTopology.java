@@ -52,7 +52,7 @@ public class myTopology extends Topology {
                 }
                 --i; // rebuild the snake
             } else {
-                //System.out.println("Snake " + i + " len " + snakeSize);
+                System.out.println("Snake " + i + " len " + snakeSize);
                 drawSnake(s);
                 snake_map.put(i, s);
             }
@@ -73,7 +73,7 @@ public class myTopology extends Topology {
         }
 
         setClockModel(new UtilClock(getClockManager()).getClass());
-        setClockSpeed(150);
+        setClockSpeed(200);
         start();
         isInitialize = true;
     }
@@ -147,7 +147,7 @@ public class myTopology extends Topology {
             Snake s = entry.getValue();
 
             if (s.size == total_num) {
-                //System.out.println("Snake " + s.num + " is the last one");
+                System.out.println("Snake " + s.num + " is the last one");
                 isFinalStage = true;
                 last = s.num;
                 straightLen = total_num + 2;
@@ -156,7 +156,7 @@ public class myTopology extends Topology {
                 //setStraighting(s);
                 return;
             }
-            //System.out.println("Snake " + s.num + " key " + entry.getKey() + " len " + s.snakeNodes.size());
+            System.out.println("Snake " + s.num + " key " + entry.getKey() + " len " + s.snakeNodes.size());
             Node head = s.snakeNodes.get(0);
             s.moveHead(head);
             if (s.isReset) {
@@ -186,7 +186,7 @@ public class myTopology extends Topology {
 
         s1.snakeNodes.addAll(s2.snakeNodes);
         s1.size += s2.size;
-        //System.out.println("Snake " + s2.num + " merged to snake " + s1.num);
+        System.out.println("Snake " + s2.num + " merged to snake " + s1.num);
     }
 
     private class Snake {
@@ -298,12 +298,12 @@ public class myTopology extends Topology {
                     return;
                 }
                 if (next_head.flag != -1) {
-                    //System.out.println("Snake " + num + " head at " + cur_head.getID() + " stops for snake " + next_head.flag + " at " + next_head.getID());
+                    System.out.println("Snake " + num + " head at " + cur_head.getID() + " stops for snake " + next_head.flag + " at " + next_head.getID());
                     // wait for merging
-                    cur_head.setColor(Color.RED);
+                    //cur_head.setColor(Color.RED);
                     if (next_head.isLast) {
                         // merge without waiting
-                        //System.out.println("Merge without waiting");
+                        System.out.println("Merge without waiting");
                         cur_head.mergingNode = next_head;
                         this.isMergeReady = true;
                         return;
@@ -319,7 +319,7 @@ public class myTopology extends Topology {
                 headmove(cur_head, next_head);
 
             } else {
-                //System.out.println("Snake " + num + " head at " + cur_head.getID() + " waiting.");
+                System.out.println("Snake " + num + " head at " + cur_head.getID() + " waiting.");
                 if (cur_head.mergingNode.flag == -1) {
                     // another snake replaced, free the waiting snake
                     for (Node n : snakeNodes) {
@@ -335,7 +335,7 @@ public class myTopology extends Topology {
         }
 
         public int resetSnake() {
-            //System.out.println("Reset snake " + num);
+            System.out.println("Reset snake " + num);
             int num = this.num;
             int retry;
             Node pre = null;
@@ -369,7 +369,7 @@ public class myTopology extends Topology {
             }
 
             if (retry == maxTry) {
-                //System.out.println("Cannot replace a snake.");
+                System.out.println("Cannot replace a snake.");
                 return -1;
             }
             return 0;
@@ -377,7 +377,7 @@ public class myTopology extends Topology {
 
         public void headmove(Node cur_head, Node next_head) {
             // set next head and insert it to the node list
-            //System.out.println("Snake " + num + " head moves from " + cur_head.getID() + " to " + next_head.getID());
+            System.out.println("Snake " + num + " head moves from " + cur_head.getID() + " to " + next_head.getID());
             next_head.setColor(Color.GREEN);
             next_head.setSize(SNAKE_NODE_SIZE);
             next_head.flag = num;
@@ -493,7 +493,7 @@ public class myTopology extends Topology {
         }
 
         private void setHead(Node cur, Node pre) {
-            //System.out.println("set cur ID " + cur.getID() + " head and delete a link with pre ID " + pre.getID());
+            System.out.println("set cur ID " + cur.getID() + " head and delete a link with pre ID " + pre.getID());
             cur.isHead = true;
             cur.setColor(Color.RED);
             cur.setSize(SNAKE_NODE_SIZE);
@@ -505,7 +505,7 @@ public class myTopology extends Topology {
         }
 
         private void setTail(Node cur, Node pre) {
-            //System.out.println("set cur ID " + cur.getID() + " tail and draw a link with pre ID " + pre.getID());
+            System.out.println("set cur ID " + cur.getID() + " tail and draw a link with pre ID " + pre.getID());
             cur.isHead = false;
             cur.setColor(Color.ORANGE);
             cur.setSize(Node.DEFAULT_SIZE);
@@ -620,7 +620,7 @@ public class myTopology extends Topology {
 
     public void finishing(Snake lastSnake) {
         if (lastSnake.snakeNodes.size() == lastSnake.size) {
-            //System.out.println("Shape Finished!!!");
+            System.out.println("Shape Finished!!!");
             return;
         }
         lastSnake.moveBody();
@@ -646,7 +646,7 @@ public class myTopology extends Topology {
 
         Node next_head;
 
-        //System.out.println("Step is " + step);
+        System.out.println("Step is " + step);
         switch(direction) {
             case 0: next_head = getLeft(cur_head);
                 break;
@@ -695,21 +695,21 @@ public class myTopology extends Topology {
     }
 
     public Node getLeft(Node cur) {
-        //System.out.println("get left");
+        System.out.println("get left");
         int tmp = cur.x - 1;
         if (tmp < 0) return null;
         return mynodes[cur.y][tmp];
     }
 
     public Node getRight(Node cur) {
-        //System.out.println("get right");
+        System.out.println("get right");
         int tmp = cur.x + 1;
         if (tmp >= xOrder) return null;
         return mynodes[cur.y][tmp];
     }
 
     public Node getLeftUp(Node cur) {
-        //System.out.println("get leftup");
+        System.out.println("get leftup");
         int tmpy = cur.y - 1;
         if (tmpy < 0) return null;
         int tmpx = (cur.y & 1) == 1 ? cur.x : cur.x - 1;
@@ -718,7 +718,7 @@ public class myTopology extends Topology {
     }
 
     public Node getLeftDown(Node cur) {
-        //System.out.println("get leftdown");
+        System.out.println("get leftdown");
         int tmpy = cur.y + 1;
         if (tmpy >= yOrder) return null;
         int tmpx = (cur.y & 1) == 1 ? cur.x : cur.x - 1;
@@ -727,7 +727,7 @@ public class myTopology extends Topology {
     }
 
     public Node getRightUp(Node cur) {
-        //System.out.println("get rightup");
+        System.out.println("get rightup");
         int tmpy = cur.y - 1;
         if (tmpy < 0) return null;
         int tmpx = (cur.y & 1) == 1 ? cur.x + 1 : cur.x;
@@ -736,7 +736,7 @@ public class myTopology extends Topology {
     }
 
     public Node getRightDown(Node cur) {
-        //System.out.println("get rightdown");
+        System.out.println("get rightdown");
         int tmpy = cur.y + 1;
         if (tmpy >= yOrder) return null;
         int tmpx = (cur.y & 1) == 1 ? cur.x + 1 : cur.x;
