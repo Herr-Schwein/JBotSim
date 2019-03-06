@@ -73,7 +73,7 @@ public class myTopology extends Topology {
         }
 
         setClockModel(new UtilClock(getClockManager()).getClass());
-        setClockSpeed(200);
+        setClockSpeed(400);
         start();
         isInitialize = true;
     }
