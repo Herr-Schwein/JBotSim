@@ -73,7 +73,7 @@ public class myTopology extends Topology {
         }
 
         setClockModel(new UtilClock(getClockManager()).getClass());
-        setClockSpeed(150);
+        setClockSpeed(100);
         start();
         isInitialize = true;
     }
@@ -153,16 +153,38 @@ public class myTopology extends Topology {
                 straightLen = total_num + 2;
                 step = (int) ((Math.sqrt(16 * total_num + 1) - 1) / 2);
                 count = step;
-                //setStraighting(s);
+                setStraighting(s);
                 return;
             }
-            //System.out.println("Snake " + s.num + " key " + entry.getKey() + " len " + s.snakeNodes.size());
+            //System.out.println("Snake " + s.num + " key " + entry.getKey() + " len " + s.snakeNodes.size() + " size " + s.size);
             Node head = s.snakeNodes.get(0);
-            s.moveHead(head);
+            if (!s.isReversing) {
+                s.moveHead(head);
+            } else {
+                //System.out.println("Reversing, snake size is " + s.size + " snake node size is " + s.snakeNodes.size());
+                Node cur_head = s.snakeNodes.get(0);
+                Node next_head = s.chooseNext(cur_head, true);
+                if (next_head != null) {
+                    for (Node n : s.snakeNodes) {
+                        n.isWaiting = false;
+                    }
+                    s.isReversing = false;
+                    s.moveHead(cur_head);
+                }
+                else if (s.size == s.snakeNodes.size()) {
+                    // check if the snake is stuck again
+                        s.reverseSnake();
+                        s.isReversing = false;
+                        continue;
+                }
+            }
+
             if (s.isReset) {
                 s.isReset = false;
                 continue;
             }
+
+
             s.moveBody();
             if (s.isMergeReady) {
                 // merge the snake to another one
@@ -192,6 +214,7 @@ public class myTopology extends Topology {
     private class Snake {
         public int size;
         public boolean isMergeReady;
+        public boolean isReversing;
         public boolean isReset = false;
         private int num;
         private ArrayList<Node> snakeNodes;
@@ -200,6 +223,7 @@ public class myTopology extends Topology {
             this.size = size;
             this.num = num;
             this.isMergeReady = false;
+            this.isReversing = false;
             snakeNodes = new ArrayList<>(size);
 
             // randomly choose a node
@@ -260,9 +284,11 @@ public class myTopology extends Topology {
                         Node tmp = next_node;
                         while (tmp.isWaiting) {
                             Node mergeNode = snake_map.get(tmp.flag).snakeNodes.get(0).mergingNode;
-                            if (mergeNode.flag == num) { // wait for itself, break out
+                            if (mergeNode != null && mergeNode.flag == num) { // wait for itself, break out
                                 break;
-                            } else {
+                            } else if (mergeNode == null) // another snake is reversing
+                                return next_node;
+                            else {
                                 tmp = mergeNode;
                             }
                         }
@@ -292,15 +318,23 @@ public class myTopology extends Topology {
             if (!cur_head.isWaiting) { // the snake is not waiting
                 Node next_head = chooseNext(cur_head, true);
                 if (next_head == null) {
+                    /*
                     // snake dead, replace
                     if (resetSnake() < 0)
                         System.exit(0);
+                    return;
+                    */
+                    // snake is stuck start reversing
+                    for (Node n : this.snakeNodes) {
+                        n.isWaiting = true;
+                    }
+                    isReversing = true;
                     return;
                 }
                 if (next_head.flag != -1) {
                     //System.out.println("Snake " + num + " head at " + cur_head.getID() + " stops for snake " + next_head.flag + " at " + next_head.getID());
                     // wait for merging
-                    cur_head.setColor(Color.RED);
+                    //cur_head.setColor(Color.RED);
                     if (next_head.isLast) {
                         // merge without waiting
                         //System.out.println("Merge without waiting");
@@ -332,6 +366,19 @@ public class myTopology extends Topology {
                     this.isMergeReady = true;
                 }
             }
+        }
+
+        public void reverseSnake() {
+            //System.out.println("Reverse snake " + num);
+            this.snakeNodes.get(0).setColor(Color.RED);
+
+            for (Node n : this.snakeNodes) {
+                n.isWaiting = false;
+                n.isLast = false;
+            }
+            this.snakeNodes.get(0).isLast = true;
+            Collections.reverse(this.snakeNodes);
+            this.snakeNodes.get(0).setColor(Color.GREEN);
         }
 
         public int resetSnake() {
@@ -424,9 +471,12 @@ public class myTopology extends Topology {
                     cur.setColor(Node.DEFAULT_COLOR);
                     snakeNodes.remove(cur);
                     pre.isLast = true;
+                    snakeNodes.trimToSize();
                 } else {
-                    if (pre.isHead)
+                    if (pre.isHead) {
                         setTail(cur, pre);
+                        cur.isLast = true;
+                    }
                 }
                 return;
             }
@@ -453,6 +503,7 @@ public class myTopology extends Topology {
                         cur.setColor(Node.DEFAULT_COLOR);
                         snakeNodes.remove(cur);
                         pre.isLast = true;
+                        snakeNodes.trimToSize();
                     }
                     return;
                 }
@@ -486,8 +537,14 @@ public class myTopology extends Topology {
                         cur.setColor(Node.DEFAULT_COLOR);
                         snakeNodes.remove(cur);
                         pre.isLast = true;
+                        snakeNodes.trimToSize();
+                    } else {
+                        if (pre.isHead) {
+                            setTail(cur, pre);
+                            cur.isLast = true;
+                        }
                     }
-                    break;
+                    return;
                 }
             }
         }
@@ -684,10 +741,34 @@ public class myTopology extends Topology {
             next_head = getRight(cur_head);
         }
         if (next_head == null || next_head.flag != -1) {
-            lastSnake.resetSnake();
-            isStraighting = false;
-            straightLen = total_num + 2;
+            if (lastSnake.size == lastSnake.snakeNodes.size()) {
+                next_head = lastSnake.chooseNext(cur_head, true);
+                if (next_head == null) {
+                    lastSnake.reverseSnake();
+                } else {
+                    lastSnake.headmove(cur_head, next_head);
+                    lastSnake.moveBody();
+                }
+                isStraighting = false;
+                straightLen = total_num + 2;
+                for (Node n : lastSnake.snakeNodes) {
+                    n.isWaiting = false;
+                }
+                lastSnake.isReversing = false;
+                return;
+            }
+            for (Node n : lastSnake.snakeNodes) {
+                n.isWaiting = true;
+            }
+            lastSnake.isReversing = true;
+            lastSnake.moveBody();
             return;
+        }
+        if (lastSnake.isReversing) {
+            for (Node n : lastSnake.snakeNodes) {
+                n.isWaiting = false;
+            }
+            lastSnake.isReversing = false;
         }
         lastSnake.headmove(cur_head, next_head);
         lastSnake.moveBody();
