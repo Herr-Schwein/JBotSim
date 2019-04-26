@@ -73,7 +73,7 @@ public class myTopology extends Topology {
         }
 
         setClockModel(new UtilClock(getClockManager()).getClass());
-        setClockSpeed(100);
+        setClockSpeed(300);
         start();
         isInitialize = true;
     }
@@ -150,8 +150,8 @@ public class myTopology extends Topology {
                 //System.out.println("Snake " + s.num + " is the last one");
                 isFinalStage = true;
                 last = s.num;
-                straightLen = total_num + 2;
-                step = (int) ((Math.sqrt(16 * total_num + 1) - 1) / 2);
+                straightLen = total_num;
+                step = (int) ((Math.sqrt(8 * total_num + 1) - 1) / 2);
                 count = step;
                 setStraighting(s);
                 return;
